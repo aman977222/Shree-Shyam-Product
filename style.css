@@ -621,3 +621,99 @@ section {
     color: var(--accent-gold) !important;
 }
 
+/* Premium Mobile & Responsive Navbar Styles */
+.navbar-toggler {
+    border-color: rgba(212, 175, 55, 0.4) !important;
+    padding: 0.4rem 0.6rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.3s ease !important;
+}
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
+}
+.navbar-toggler-icon {
+    filter: invert(1) !important; /* Converts black icon to white/light */
+}
+
+/* Sub-navbar (second child) responsive layout */
+.bg-blue.navbar {
+    padding: 8px 16px !important;
+    min-height: 40px;
+}
+.bg-blue.navbar .navbar-nav {
+    flex-direction: row !important;
+    display: flex !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.bg-blue.navbar .nav-item {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.bg-blue.navbar .nav-link {
+    font-size: 0.85rem !important;
+    padding: 4px 8px !important;
+    letter-spacing: 0.5px;
+}
+
+/* Premium Desktop-style layout on Mobile (Always Expanded) */
+@media (max-width: 991.98px) {
+    /* Hide toggler since we display everything inline */
+    .navbar-toggler {
+        display: none !important;
+    }
+
+    /* Force the collapse container to be always visible and behave as a flex row */
+    .navbar-collapse {
+        display: flex !important;
+        flex-basis: 100% !important;
+        flex-grow: 1 !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-top: 8px !important;
+    }
+
+    /* Wrap the navigation links horizontally */
+    .navbar-nav {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        width: 100% !important;
+        gap: 6px !important;
+        margin: 8px 0 !important;
+        padding: 0 !important;
+    }
+
+    .navbar-nav .nav-item {
+        padding: 2px 4px !important;
+        border-bottom: none !important;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 0.8rem !important;
+        padding: 4px 6px !important;
+        white-space: nowrap !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Keep Search Form centered and well-spaced */
+    .navbar-collapse .d-flex {
+        width: 100% !important;
+        max-width: 450px !important;
+        margin: 8px auto 4px auto !important;
+        justify-content: center !important;
+    }
+
+    /* Ensure Logo and outer layout wrap correctly */
+    .navbar > .container-fluid {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+}
