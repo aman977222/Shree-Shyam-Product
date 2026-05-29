@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce website - Search Results</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome link-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!--css file link-->
+    <link rel="stylesheet" href="style.css">
+    <style>
+      body {
+          overflow-x: hidden;
+      }
+    </style>
+</head>
+<body>
+<section>
+   <!--navbar-->
+   <div class="container-fluid p-0">
+     <!---first child-->
+     <nav class="navbar navbar-expand-lg navbar-light bg-info">
+       <div class="container-fluid">
+         <img src="./image/logo.png" alt="" class="logo">
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+             <li class="nav-item">
+               <a class="nav-link" aria-current="page" href="index.html">Home</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link text-active" href="display_all.html">products</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="contact.html">contact</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="cart.html"><i class='fa-solid fa-cart-shopping'></i><sup id="cart-item-count">0</sup></a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="#" id="cart-total-price">Total Price: 0/-</a>
+             </li>
+             <li class="nav-item" id="my-account-nav" style="display:none;">
+               <a class="nav-link" href="user_area/profile.html"><i class='fa-solid fa-user'></i>MY ACCOUNT</a>
+             </li>
+             <li class="nav-item" id="register-nav">
+               <a class="nav-link" href="user_area/user_registration.html">Register</a>
+             </li>
+           </ul>
+           <form class="d-flex" action="search_product.html" method="get">
+             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search_data" id="search-input">
+             <input type="submit" value="search" class="btn btn-outline-light" name="search_data_product">
+           </form>
+           <a class="nav-link ms-2" href="admin_area/index.html" id="admin-area-link" style="display:none;">
+             <i class="fa-solid fa-user-shield">Admin area</i>
+           </a>
+         </div>
+       </div>
+     </nav>
+
+     <!--second child-->
+     <nav class="navbar navbar-expand-lg navbar-dark bg-blue">
+         <ul class="navbar-nav me-auto">
+             <li class="nav-item">
+                 <a class="nav-link" href="#" id="welcome-message">Welcome Guest</a>
+             </li>
+             <li class="nav-item" id="login-logout-nav">
+                 <a class="nav-link" href="user_area/user_login.html">Login</a>
+             </li>
+         </ul>
+     </nav>
+
+     <!--third child-->
+     <div class="bg-blue py-3">
+         <h3 class="text-center" style="color: var(--accent-gold); font-weight: 700;">Shree Shyam Products</h3>
+         <p class="text-center mb-0" style="color: var(--text-secondary);">Communication is at the heart of e-commerce and community</p>
+     </div>
+
+     <!--fourth child-->
+     <div class="row m-0 p-3">
+         <div class="col-md-10">
+             <!--products-->
+             <div class="row px-1" id="products-container">
+                 <!-- Fetching search products dynamically -->
+             </div>
+         </div>
+         
+         <div class="col-md-2 text-left bg-blue p-0">
+             <!--brands to be displayed-->
+             <ul class="navbar-nav me-auto text-center">
+                 <li class="nav-item bg-info">
+                   <a href="#" class="nav-link"><h4>Delivery Brands</h4></a>
+                 </li>
+                 <div id="brands-container"></div>
+             </ul>
+
+             <!--categories to be displayed-->
+             <ul class="navbar-nav me-auto text-center mt-3">
+                 <li class="nav-item bg-info">
+                   <a href="#" class="nav-link"><h4>categories</h4></a>
+                 </li>
+                 <div id="categories-container"></div>
+             </ul>
+         </div>
+     </div>
+
+     <!--footer-->
+     <div class="bg-info p-3 text-center mt-5">
+         <p>reserved Designd by aman(vgu24ons2bca****)</p>
+     </div>
+   </div>
+</section>
+
+<!-- Import Firebase and database layer -->
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<script src="data.js"></script>
+<script>
+    async function initPage() {
+        // Wait for cloud database to initialize
+        await dbInit();
+
+        // Check user session
+        const user = getLoggedInUser();
+        const welcomeMsg = document.getElementById("welcome-message");
+        const loginLogoutNav = document.getElementById("login-logout-nav");
+        const myAccountNav = document.getElementById("my-account-nav");
+        const registerNav = document.getElementById("register-nav");
+        const adminAreaLink = document.getElementById("admin-area-link");
+
+        if (user) {
+            let userImgSrc = 'user_area/user_images/default.png';
+            if (user.user_image) {
+                if (user.user_image.startsWith('data:image')) {
+                    userImgSrc = user.user_image;
+                } else {
+                    userImgSrc = `user_area/user_images/${user.user_image}`;
+                }
+            }
+            if (welcomeMsg) {
+                welcomeMsg.innerText = `Welcome ${user.username}`;
+            }
+            loginLogoutNav.innerHTML = `<a class="nav-link" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>`;
+            if (myAccountNav) {
+                myAccountNav.style.display = "block";
+                const isAdmin = (user.role === "admin" || user.role === "superadmin");
+                const profileLink = isAdmin ? "admin_area/index.html" : "user_area/profile.html";
+                const linkText = isAdmin ? `<i class="fa-solid fa-user-shield me-1"></i>ADMIN AREA` : `<i class="fa-solid fa-user me-1"></i>MY ACCOUNT`;
+                myAccountNav.innerHTML = `<a class="nav-link" href="${profileLink}">${linkText}</a>`;
+            }
+            registerNav.style.display = "none";
+            if (adminAreaLink) {
+                adminAreaLink.style.display = "none";
+            }
+        } else {
+            if (welcomeMsg) welcomeMsg.innerText = "Welcome Guest";
+            loginLogoutNav.innerHTML = `<a class="nav-link" href="user_area/user_login.html">Login</a>`;
+            if (myAccountNav) {
+                myAccountNav.style.display = "none";
+                myAccountNav.innerHTML = `<a class="nav-link" href="user_area/profile.html"><i class="fa-solid fa-user"></i>MY ACCOUNT</a>`;
+            }
+            registerNav.style.display = "block";
+            adminAreaLink.style.display = "none";
+        }
+
+        // Update cart elements
+        document.getElementById("cart-item-count").innerText = getCartCount();
+        document.getElementById("cart-total-price").innerText = `Total Price: ${getCartTotal()}/-`;
+
+        // Render Brands and Categories in Sidebar
+        const brands = getBrands();
+        const categories = getCategories();
+        const brandsContainer = document.getElementById("brands-container");
+        const categoriesContainer = document.getElementById("categories-container");
+
+        brands.forEach(b => {
+            brandsContainer.innerHTML += `
+                <li class='nav-item'>
+                    <a href='index.html?brand=${b.Brands_id}' class='nav-link bg-white text-center border-bottom py-2'>${b.Brands_title}</a>
+                </li>`;
+        });
+
+        categories.forEach(c => {
+            categoriesContainer.innerHTML += `
+                <li class='nav-item'>
+                    <a href='index.html?category=${c.categories_id}' class='nav-link bg-white text-center border-bottom py-2'>${c.categories_title}</a>
+                </li>`;
+        });
+
+        // Render Search filtered products
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchFilter = urlParams.get('search_data');
+
+        let products = getProducts();
+
+        if (searchFilter) {
+            products = products.filter(p => p.product_keywords.toLowerCase().includes(searchFilter.toLowerCase()) || p.product_title.toLowerCase().includes(searchFilter.toLowerCase()));
+        }
+
+        const productsContainer = document.getElementById("products-container");
+        if (products.length === 0) {
+            productsContainer.innerHTML = `<h2 class='text-center text-light mt-5'>No results match. No products found for this search!</h2>`;
+        } else {
+            products.forEach(p => {
+                productsContainer.innerHTML += `
+                    <div class='col-md-4 mb-4'>
+                        <div class='card shadow-sm'>
+                            <img src='./admin_area/product_images/${p.product_Image1}' class='card-img-top' alt='${p.product_title}'>
+                            <div class='card-body text-center'>
+                                <h5 class='card-title'>${p.product_title}</h5>
+                                <p class='card-text text-truncate' style="max-width: 100%;">${p.product_description}</p>
+                                <p class='card-text fw-bold'>Price: ${p.product_price}/-</p>
+                                <a href='#' onclick="handleAddToCart(${p.product_id})" class='btn btn-info px-3 me-2'>ADD to cart</a>
+                                <a href='product_details.html?product_id=${p.product_id}' class='btn btn-secondary px-3'>view more</a>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    function handleLogout() {
+        logoutUser();
+        window.location.reload();
+    }
+
+    function handleAddToCart(id) {
+        addToCart(id);
+        window.location.reload();
+    }
+
+    // Invoke page load initialization
+    initPage();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

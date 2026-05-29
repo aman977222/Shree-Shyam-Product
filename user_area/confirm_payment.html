@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Payment</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--css file link-->
+    <link rel="stylesheet" href="../style.css">
+     <style>
+      body{
+      overflow-x:hidden;
+      }
+      section {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(8, 9, 12, 0.96), rgba(18, 19, 26, 0.98)), url('../image/background.jpg') no-repeat;
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+      }
+      .form-glass-card {
+          background: rgba(18, 20, 26, 0.7) !important;
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          border-radius: 20px !important;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+          padding: 35px;
+      }
+      .form-control-luxury {
+          background: rgba(8, 9, 12, 0.5) !important;
+          border: 1px solid rgba(212, 175, 55, 0.25) !important;
+          color: #f1f5f9 !important;
+          border-radius: 12px;
+          padding: 10px 16px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .form-control-luxury:focus {
+          background: rgba(8, 9, 12, 0.85) !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 15px rgba(212, 175, 55, 0.25) !important;
+          color: #ffffff !important;
+          outline: none;
+      }
+      .form-control-luxury[readonly] {
+          background: rgba(8, 9, 12, 0.3) !important;
+          border-color: rgba(212, 175, 55, 0.1) !important;
+          color: #94a3b8 !important;
+      }
+      .form-label-luxury {
+          color: #d4af37 !important;
+          font-weight: 600;
+          font-size: 0.9rem;
+          letter-spacing: 0.5px;
+          margin-bottom: 6px;
+      }
+      .btn-luxury-primary {
+          background: linear-gradient(135deg, #d4af37, #aa841c) !important;
+          border: none !important;
+          color: #08090c !important;
+          font-weight: 700 !important;
+          border-radius: 30px !important;
+          padding: 10px 28px !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      }
+      .btn-luxury-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      }
+      .btn-luxury-secondary {
+          background: transparent !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          color: #f1f5f9 !important;
+          font-weight: 600 !important;
+          border-radius: 30px !important;
+          padding: 10px 28px !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+      }
+      .btn-luxury-secondary:hover {
+          border-color: #d4af37 !important;
+          color: #d4af37 !important;
+          transform: translateY(-2px);
+      }
+    </style>
+</head>
+<body>
+    <section>
+        <div class="container-fluid py-5">
+            <h2 class="text-center text-light mb-4" style="font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                Confirm <span style="color: #d4af37;">Payment</span>
+            </h2>
+            <div class="row d-flex align-items-center justify-content-center mt-5">
+                <div class="col-lg-8 col-xl-5">
+                    <form id="payment-form" onsubmit="handlePaymentSubmit(event)" class="form-glass-card text-light">
+                        <!-- Invoice Number field -->
+                        <div class="form-outline mb-3">
+                            <label for="invoice_number" class="form-label-luxury">Invoice Number</label>
+                            <input type="text" id="invoice_number" class="form-control form-control-luxury" readonly required>
+                        </div>
+                        <!-- Amount field -->
+                        <div class="form-outline mb-3">
+                            <label for="amount" class="form-label-luxury">Amount Due</label>
+                            <input type="text" id="amount" class="form-control form-control-luxury" readonly required>
+                        </div>
+                        <!-- Payment Mode select -->
+                        <div class="form-outline mb-4">
+                            <label for="payment_mode" class="form-label-luxury">Select Payment Method</label>
+                            <select id="payment_mode" class="form-select form-control-luxury" required>
+                                <option value="" style="background: #12141a; color: #fff;">Select Payment Method</option>
+                                <option value="UPI" style="background: #12141a; color: #fff;">UPI / GPay / PhonePe</option>
+                                <option value="NetBanking" style="background: #12141a; color: #fff;">Net Banking</option>
+                                <option value="Card" style="background: #12141a; color: #fff;">Credit / Debit Card</option>
+                                <option value="COD" style="background: #12141a; color: #fff;">Cash on Delivery (COD)</option>
+                            </select>
+                        </div>
+                        <!-- Submit button -->
+                        <div class="text-center pt-2">
+                            <input type="submit" value="Confirm Payment" class="btn btn-luxury-primary px-4 py-2">
+                            <a href="profile.html" class="btn btn-luxury-secondary px-4 py-2 ms-2">Back to Profile</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Import Firebase and database layer -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="../data.js"></script>
+    <script>
+        let orderId = null;
+
+        async function initPage() {
+            // Wait for cloud database to initialize
+            await dbInit();
+
+            // Enforce login
+            const user = getLoggedInUser();
+            if (!user) {
+                window.location.href = "user_login.html";
+                return;
+            }
+
+            // Retrieve order ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const oid = urlParams.get('order_id');
+            if (!oid) {
+                alert("Order ID is missing!");
+                window.location.href = "profile.html";
+                return;
+            }
+            orderId = parseInt(oid);
+
+            // Fetch order details
+            const order = getOrders().find(o => o.order_id === orderId);
+            if (!order) {
+                alert("Order not found!");
+                window.location.href = "profile.html";
+                return;
+            }
+
+            // Populating fields
+            document.getElementById("invoice_number").value = order.invoice_number;
+            document.getElementById("amount").value = `${order.amount_due} /-`;
+        }
+
+        async function handlePaymentSubmit(e) {
+            e.preventDefault();
+            const payMode = document.getElementById("payment_mode").value;
+
+            if (!payMode) {
+                alert("Please select a payment method.");
+                return;
+            }
+
+            try {
+                // Update order status in Firebase Firestore to complete/paid
+                await cloudCompleteOrder(orderId, payMode);
+                alert("Payment details successfully received. Your order is now marked as Completed/Paid!");
+                window.location.href = "profile.html";
+            } catch (err) {
+                console.error("Error confirming payment:", err);
+                alert("Failed to confirm payment. Please try again.");
+            }
+        }
+
+        // Initialize page database layer
+        initPage();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

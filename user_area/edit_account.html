@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Account</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome link-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!--css file link-->
+    <link rel="stylesheet" href="../style.css">
+    <style>
+      body {
+          overflow-x: hidden;
+      }
+      section {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(8, 9, 12, 0.96), rgba(18, 19, 26, 0.98)), url('../image/background.jpg') no-repeat;
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      .glass-card {
+          background: rgba(18, 20, 26, 0.65) !important;
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          border-radius: 24px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+          padding: 40px;
+          margin-top: 20px;
+          animation: luxuryEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .form-control-luxury {
+          background: rgba(8, 9, 12, 0.5) !important;
+          border: 1px solid rgba(212, 175, 55, 0.25) !important;
+          color: #f1f5f9 !important;
+          border-radius: 12px;
+          padding: 12px 18px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .form-control-luxury:focus {
+          background: rgba(8, 9, 12, 0.85) !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 15px rgba(212, 175, 55, 0.25) !important;
+          color: #ffffff !important;
+          outline: none;
+      }
+      .form-control-luxury::placeholder {
+          color: #64748b !important;
+      }
+      .form-label-luxury {
+          color: #d4af37 !important;
+          font-weight: 600;
+          font-size: 0.9rem;
+          letter-spacing: 0.5px;
+          margin-bottom: 8px;
+      }
+      .profile_image_edit {
+          width: 80px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: 12px;
+          border: 2px solid rgba(212, 175, 55, 0.4);
+          box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+          transition: all 0.3s ease;
+      }
+      .btn-luxury-primary {
+          background: linear-gradient(135deg, #d4af37, #aa841c) !important;
+          border: none !important;
+          color: #08090c !important;
+          font-weight: 700 !important;
+          border-radius: 12px !important;
+          padding: 12px 24px !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      }
+      .btn-luxury-primary:hover {
+          transform: translateY(-2px);
+          background: linear-gradient(135deg, #e5c158, #c5a059) !important;
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      }
+      .btn-luxury-secondary {
+          background: transparent !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          color: #f1f5f9 !important;
+          border-radius: 12px !important;
+          padding: 12px 24px !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+      }
+      .btn-luxury-secondary:hover {
+          border-color: #d4af37 !important;
+          color: #d4af37 !important;
+          transform: translateY(-2px);
+      }
+      @keyframes luxuryEntrance {
+          from {
+              opacity: 0;
+              transform: translateY(30px);
+          }
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+    </style>
+</head>
+<body>
+    <section>
+        <div class="container py-5">
+            <h2 class="text-center text-light mb-4">Edit Account Details</h2>
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-lg-10 col-xl-8">
+                    <div class="glass-card mb-5">
+                        <form id="edit-form" onsubmit="handleProfileUpdate(event)">
+                            <!-- Username field -->
+                            <div class="form-outline mb-3">
+                                <label for="edit-username" class="form-label-luxury">Username</label>
+                                <input type="text" id="edit-username" class="form-control form-control-luxury" placeholder="Username" required autocomplete="off">
+                            </div>
+                            <!-- Email field -->
+                            <div class="form-outline mb-3">
+                                <label for="edit-email" class="form-label-luxury">Email Address</label>
+                                <input type="email" id="edit-email" class="form-control form-control-luxury" placeholder="Email" required autocomplete="off">
+                            </div>
+                            <!-- Profile image preview and input -->
+                            <div class="form-outline mb-3">
+                                <label for="edit-image" class="form-label-luxury">Profile Image</label>
+                                <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                                    <input type="file" id="edit-image" class="form-control form-control-luxury flex-grow-1" accept="image/*">
+                                    <img id="edit-preview-pic" src="" alt="Profile Preview" class="profile_image_edit" onerror="handleProfilePicError(this)">
+                                </div>
+                            </div>
+                            <!-- Address field -->
+                            <div class="form-outline mb-3">
+                                <label for="edit-address" class="form-label-luxury">Address</label>
+                                <input type="text" id="edit-address" class="form-control form-control-luxury" placeholder="Address" required autocomplete="off">
+                            </div>
+                            <!-- Mobile field -->
+                            <div class="form-outline mb-4">
+                                <label for="edit-mobile" class="form-label-luxury">Mobile Number</label>
+                                <input type="text" id="edit-mobile" class="form-control form-control-luxury" placeholder="Mobile" required autocomplete="off">
+                            </div>
+                            <!-- Submit and Go Back -->
+                            <div class="mt-4 pt-2 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                <div>
+                                    <input type="submit" value="Update Profile" class="btn-luxury-primary">
+                                    <a href="profile.html" class="btn-luxury-secondary text-decoration-none ms-2">Cancel</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Import Firebase and database layer -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="../data.js"></script>
+    <script>
+        let user = null;
+
+        async function initPage() {
+            // Wait for cloud database updates
+            await dbInit();
+
+            // Fetch current logged in user
+            user = getLoggedInUser();
+            if (!user) {
+                window.location.href = "user_login.html";
+                return;
+            }
+
+            // Fill input values
+            document.getElementById("edit-username").value = user.username;
+            document.getElementById("edit-email").value = user.user_email;
+            document.getElementById("edit-address").value = user.user_address;
+            document.getElementById("edit-mobile").value = user.user_mobile;
+
+            let editPicSrc = 'user_images/default.png';
+            if (user.user_image) {
+                if (user.user_image.startsWith('data:image')) {
+                    editPicSrc = user.user_image;
+                } else {
+                    editPicSrc = `user_images/${user.user_image}`;
+                }
+            }
+            document.getElementById("edit-preview-pic").src = editPicSrc;
+        }
+
+        // Live Preview image on selection
+        document.getElementById('edit-image').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const preview = document.getElementById('edit-preview-pic');
+                preview.src = URL.createObjectURL(file);
+            }
+        });
+
+        function handleProfilePicError(img) {
+            img.onerror = null;
+            const name = user ? user.username : 'User';
+            img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=d4af37&color=000&size=128&bold=true`;
+        }
+
+        async function handleProfileUpdate(e) {
+            e.preventDefault();
+            const usernameVal = document.getElementById("edit-username").value.trim();
+            const emailVal = document.getElementById("edit-email").value.trim();
+            const addressVal = document.getElementById("edit-address").value.trim();
+            const mobileVal = document.getElementById("edit-mobile").value.trim();
+
+            const fileInput = document.getElementById("edit-image");
+            let newImage = user.user_image;
+            if (fileInput.files[0]) {
+                try {
+                    newImage = await compressAndResizeImage(fileInput.files[0], 150, 150);
+                } catch (err) {
+                    console.error("Error compressing image:", err);
+                    newImage = fileInput.files[0].name;
+                }
+            }
+
+            const updatedData = {
+                username: usernameVal,
+                user_email: emailVal,
+                user_address: addressVal,
+                user_mobile: mobileVal,
+                user_image: newImage,
+                role: user.role || 'user',
+                user_password: user.user_password
+            };
+
+            try {
+                if (usernameVal !== user.username) {
+                    // Check if new username is already taken
+                    const userDoc = await db.collection("users").doc(usernameVal).get();
+                    if (userDoc.exists) {
+                        alert("Username already taken!");
+                        return;
+                    }
+                    
+                    // Write new document and delete old document
+                    await db.collection("users").doc(usernameVal).set(updatedData);
+                    await db.collection("users").doc(user.username).delete();
+
+                    // Update username in all user orders
+                    const ordersSnapshot = await db.collection("orders").where("username", "==", user.username).get();
+                    for (const doc of ordersSnapshot.docs) {
+                        await doc.ref.update({ username: usernameVal });
+                    }
+                } else {
+                    await cloudUpdateUser(user.username, updatedData);
+                }
+
+                alert("Account updated successfully! Please login again.");
+                logoutUser();
+                window.location.href = "user_login.html";
+            } catch (err) {
+                console.error("Error updating profile:", err);
+                alert("Failed to update profile. Please try again.");
+            }
+        }
+
+        // Initialize page execution
+        initPage();
+    </script>
+</body>
+</html>

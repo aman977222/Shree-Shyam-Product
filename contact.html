@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>contact form</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome link-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!--css file link-->
+    <link rel="stylesheet" href="style.css">
+    <style>
+      body{
+      overflow-x:hidden;
+      }
+    </style>
+</head>
+<body>
+  <section>
+    <div class="container py-5 contact-container">
+        <div class="row d-flex align-items-center justify-content-center">
+            <div class="col-lg-10 col-xl-7">
+                <div class="card p-5 shadow-lg border-0">
+                    <h2 class="text-center mb-3" style="color: var(--accent-gold); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Get In Touch</h2>
+                    <p class="text-center text-secondary mb-5">Have questions or feedback? Send us a message and we'll reply as soon as possible.</p>
+                    
+                    <form id="contact-form" onsubmit="handleContactSubmit(event)">
+                        <!-- username field-->
+                        <div class="form-outline mb-4">
+                            <label for="user_username" class="form-label">Username</label>
+                            <input type="text" id="user_username" class="form-control" placeholder="Username" autocomplete="off" required name="user_username" readonly>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Email" autocomplete="off" required name="email" readonly>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <label for="mobile_number" class="form-label">Mobile number</label>
+                            <input type="text" id="mobile_number" class="form-control" placeholder="Mobile number" autocomplete="off" required name="mobile_number" readonly>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" id="subject" class="form-control" placeholder="Enter message subject" autocomplete="off" required name="subject">
+                        </div>
+                        <div class="form-outline mb-4">
+                            <label for="messages" class="form-label">Messages</label>
+                            <textarea name="messages" id="messages" cols="30" rows="5" class="form-control" placeholder="Enter your messages" autocomplete="off" required></textarea>
+                        </div>
+                        <div class="mt-4 pt-2 text-center">
+                            <input type="submit" value="Submit Message" class="btn btn-info py-2 px-5 border-0">
+                            <a href="index.html" class="btn btn-secondary py-2 px-5 ms-3 border-0">Go Home</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <!-- Import Firebase and database layer -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="data.js"></script>
+  <script>
+      async function initPage() {
+          await dbInit();
+          const user = getLoggedInUser();
+          if (!user) {
+              window.location.href = "user_area/user_login.html";
+              return;
+          }
+          document.getElementById("user_username").value = user.username || "";
+          document.getElementById("email").value = user.user_email || "";
+          document.getElementById("mobile_number").value = user.user_mobile || "";
+      }
+
+      async function handleContactSubmit(e) {
+          e.preventDefault();
+          const username = document.getElementById("user_username").value;
+          const email = document.getElementById("email").value;
+          const mobile = document.getElementById("mobile_number").value;
+          const subject = document.getElementById("subject").value;
+          const msg = document.getElementById("messages").value;
+
+          const msgData = {
+              username: username,
+              email: email,
+              user_mobile: mobile,
+              subject: subject,
+              messages: msg
+          };
+
+          try {
+              await addMessage(msgData);
+              showSuccessAlert("Thank You!", "Your message has been sent successfully. We'll get back to you shortly.", "index.html");
+          } catch (err) {
+              console.error("Error sending message:", err);
+              alert("Failed to send message. Please try again.");
+          }
+      }
+
+      // Initialize page database layer
+      initPage();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

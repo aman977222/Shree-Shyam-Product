@@ -1,0 +1,4 @@
+# Ignore scratch scripts
+scratch/
+.gemini/
+*.log

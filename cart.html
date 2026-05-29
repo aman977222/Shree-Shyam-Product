@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce website - Cart Details</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome link-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!--css file link-->
+    <link rel="stylesheet" href="style.css">
+    <style>
+      body{
+      overflow-x:hidden;
+      }
+      .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+      }
+    </style>
+</head>
+<body>
+<section>
+   <!--navbar-->
+   <div class="container-fluid p-0">
+     <!---first child-->
+     <nav class="navbar navbar-expand-lg navbar-light bg-info">
+       <div class="container-fluid">
+         <img src="./image/logo.png" alt="" class="logo">
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+             <li class="nav-item">
+               <a class="nav-link" aria-current="page" href="index.html">Home</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="display_all.html">products</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="contact.html">contact</a>
+             </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="cart.html"><i class='fa-solid fa-cart-shopping'></i><sup id="cart-item-count">0</sup></a>
+              </li>
+              <li class="nav-item" id="my-account-nav" style="display:none;">
+                <a class="nav-link" href="user_area/profile.html"><i class='fa-solid fa-user'></i>MY ACCOUNT</a>
+              </li>
+            </ul>
+            <a class="nav-link ms-2" href="admin_area/index.html" id="admin-area-link" style="display:none;">
+              <i class="fa-solid fa-user-shield">Admin area</i>
+            </a>
+          </div>
+       </div>
+     </nav>
+
+     <!--second child-->
+     <nav class="navbar navbar-expand-lg navbar-dark bg-blue">
+         <ul class="navbar-nav me-auto">
+             <li class="nav-item">
+                 <a class="nav-link" href="#" id="welcome-message">Welcome Guest</a>
+             </li>
+             <li class="nav-item" id="login-logout-nav">
+                 <a class="nav-link" href="user_area/user_login.html">Login</a>
+             </li>
+         </ul>
+     </nav>
+
+     <!--third child-->
+     <div class="bg-blue text-light py-3">
+         <h3 class="text-center" style="color: var(--accent-gold); font-weight: 700;">&/Home page\&</h3>
+         <p class="text-center mb-0" style="color: var(--text-secondary);">Communication is at the heart of e-commerce and community</p>
+     </div>
+
+     <!--fourth child-->
+     <div class="container mt-5 cart-container">
+         <div class="row">
+             <form id="cart-form" onsubmit="event.preventDefault();">
+                 <div class="table-responsive">
+                     <table class="table table-bordered text-center mb-0">
+                         <thead id="cart-table-head">
+                             <!-- Dynamically written head -->
+                         </thead>
+                         <tbody id="cart-table-body">
+                             <!-- Dynamic data rows -->
+                         </tbody>
+                     </table>
+                 </div>
+                 
+                 <!-- subtotal and actions -->
+                 <div class="d-flex mb-3 mt-4" id="cart-actions-container">
+                     <!-- Dynamically written subtotal & buttons -->
+                 </div>
+             </form>
+         </div>
+     </div>
+
+     <!--footer-->
+     <div class="bg-info p-3 text-center mt-5">
+         <p class="mb-0">reserved Designd by aman(vgu24ons2bca****)</p>
+     </div>
+   </div>
+</section>
+
+<!-- Import Firebase and database layer -->
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<script src="data.js"></script>
+<script>
+    async function initPage() {
+        // Wait for cloud database to initialize
+        await dbInit();
+
+        // Enforce login as requested in the original PHP
+        const user = getLoggedInUser();
+        if (!user) {
+            window.location.href = "user_area/user_login.html";
+            return;
+        }
+
+        const welcomeMsg = document.getElementById("welcome-message");
+        const loginLogoutNav = document.getElementById("login-logout-nav");
+        const myAccountNav = document.getElementById("my-account-nav");
+        const adminAreaLink = document.getElementById("admin-area-link");
+
+        let userImgSrc = 'user_area/user_images/default.png';
+        if (user.user_image) {
+            if (user.user_image.startsWith('data:image')) {
+                userImgSrc = user.user_image;
+            } else {
+                userImgSrc = `user_area/user_images/${user.user_image}`;
+            }
+        }
+
+        if (welcomeMsg) {
+            welcomeMsg.innerText = `Welcome ${user.username}`;
+        }
+        loginLogoutNav.innerHTML = `<a class="nav-link" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>`;
+
+        if (myAccountNav) {
+            myAccountNav.style.display = "block";
+            const isAdmin = (user.role === "admin" || user.role === "superadmin");
+            const profileLink = isAdmin ? "admin_area/index.html" : "user_area/profile.html";
+            const linkText = isAdmin ? `<i class="fa-solid fa-user-shield me-1"></i>ADMIN AREA` : `<i class="fa-solid fa-user me-1"></i>MY ACCOUNT`;
+            myAccountNav.innerHTML = `<a class="nav-link" href="${profileLink}">${linkText}</a>`;
+        }
+
+        if (adminAreaLink) {
+            adminAreaLink.style.display = "none";
+        }
+
+        // Initial render call
+        renderCart();
+    }
+
+    function handleLogout() {
+        logoutUser();
+        window.location.reload();
+    }
+
+    // Render Cart Details
+    function renderCart() {
+        const cart = getCart();
+        const products = getProducts();
+        document.getElementById("cart-item-count").innerText = cart.length;
+
+        const tableHead = document.getElementById("cart-table-head");
+        const tableBody = document.getElementById("cart-table-body");
+        const actionsContainer = document.getElementById("cart-actions-container");
+
+        if (cart.length === 0) {
+            tableHead.innerHTML = "";
+            tableBody.innerHTML = `<tr><td colspan="5"><h2 class='text-center text-danger py-4'>Cart is empty</h2></td></tr>`;
+            actionsContainer.innerHTML = `
+                <button type="button" class='btn btn-info py-2 px-4 border-0' onclick="window.location.href='index.html'"><i class="fa-solid fa-chevron-left me-2"></i> Continue Shopping</button>
+            `;
+            return;
+        }
+
+        tableHead.innerHTML = `
+            <tr>
+                <th>Product Title</th>
+                <th>Product Image</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Operations</th>
+            </tr>
+        `;
+
+        tableBody.innerHTML = "";
+        let calculatedTotal = 0;
+
+        cart.forEach(item => {
+            const prod = products.find(p => p.product_id === item.product_id);
+            if (prod) {
+                const itemTotal = prod.product_price * item.quanthy;
+                calculatedTotal += itemTotal;
+
+                tableBody.innerHTML += `
+                    <tr id="row-${prod.product_id}">
+                        <td class="fw-bold">${prod.product_title}</td>
+                        <td><img src="./admin_area/product_images/${prod.product_Image1}" alt="${prod.product_title}" class="cart_img" style="width:85px; height:85px; object-fit:contain; border-radius: 10px; padding: 4px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-card);"></td>
+                        <td><input type="number" id="qty-${prod.product_id}" class="cart-qty-input" value="${item.quanthy}" min="1"></td>
+                        <td class="fw-bold" style="color: var(--accent-gold);">${itemTotal}/-</td>
+                        <td>
+                            <button type="button" class="btn btn-cart-remove btn-sm" onclick="removeItem(${prod.product_id})"><i class="fa-solid fa-trash me-1"></i> Remove</button>
+                        </td>
+                    </tr>
+                `;
+            }
+        });
+
+        actionsContainer.innerHTML = `
+            <div class="d-flex align-items-center flex-wrap gap-3 w-100 justify-content-between mt-4">
+                <h4 class='px-4 py-2 mb-0 d-flex align-items-center rounded' style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary);">Subtotal: <strong class="ms-2" style="color: var(--accent-gold);">${calculatedTotal}/-</strong></h4>
+                <div>
+                    <button type='button' class='btn btn-secondary py-2 px-4 me-2 border-0' onclick="window.location.href='index.html'"><i class="fa-solid fa-chevron-left me-2"></i> Continue Shopping</button>
+                    <button type='button' class='btn btn-warning py-2 px-4 me-2 border-0 text-dark fw-bold' onclick="updateAllQuantities()"><i class="fa-solid fa-arrows-rotate me-2"></i> Update Cart</button>
+                    <button type='button' class='btn btn-info py-2 px-4' onclick="window.location.href='user_area/checkout.html'">Checkout <i class="fa-solid fa-credit-card ms-2"></i></button>
+                </div>
+            </div>
+        `;
+    }
+
+    function updateAllQuantities() {
+        const cart = getCart();
+        cart.forEach(item => {
+            const inputEl = document.getElementById(`qty-${item.product_id}`);
+            if (inputEl) {
+                const newQty = parseInt(inputEl.value) || 1;
+                updateCartQuantity(item.product_id, newQty);
+            }
+        });
+        renderCart();
+        showSuccessAlert("Updated!", "Your cart quantities have been updated successfully.", "");
+    }
+
+    function removeItem(productId) {
+        if (!confirm("Are you sure you want to remove this item from your cart?")) {
+            return;
+        }
+        const row = document.getElementById(`row-${productId}`);
+        if (row) {
+            row.classList.add("row-exit-animation");
+            setTimeout(() => {
+                removeCartItem(productId);
+                renderCart();
+                // Bounce notification counter badge
+                const badge = document.getElementById("cart-item-count");
+                if (badge) {
+                    badge.classList.add("bounce-animation");
+                    setTimeout(() => badge.classList.remove("bounce-animation"), 600);
+                }
+            }, 450);
+        } else {
+            removeCartItem(productId);
+            renderCart();
+        }
+    }
+
+    // Invoke page load initialization
+    initPage();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

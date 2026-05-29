@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome link-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!--css file link-->
+    <link rel="stylesheet" href="../style.css">
+    <style>
+      body{
+      overflow-x:hidden;
+      }
+      section {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(8, 9, 12, 0.96), rgba(18, 19, 26, 0.98)), url('../image/background.jpg') no-repeat;
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+      }
+      .profile_img{
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(212, 175, 55, 0.4);
+          box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+      }
+      .profile_image_edit {
+          width: 80px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: 10px;
+          border: 1px solid rgba(212, 175, 55, 0.2);
+      }
+      .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+      }
+      .profile-card {
+          background: rgba(22, 24, 30, 0.75) !important;
+          backdrop-filter: blur(14px);
+          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          border-radius: 20px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          padding: 20px;
+      }
+      .form-glass-card {
+          background: rgba(18, 20, 26, 0.7) !important;
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          border-radius: 20px !important;
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+          padding: 30px;
+      }
+      .form-control-luxury {
+          background: rgba(8, 9, 12, 0.5) !important;
+          border: 1px solid rgba(212, 175, 55, 0.25) !important;
+          color: #f1f5f9 !important;
+          border-radius: 12px;
+          padding: 10px 16px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .form-control-luxury:focus {
+          background: rgba(8, 9, 12, 0.85) !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 15px rgba(212, 175, 55, 0.25) !important;
+          color: #ffffff !important;
+          outline: none;
+      }
+      .form-label-luxury {
+          color: #d4af37 !important;
+          font-weight: 600;
+          font-size: 0.9rem;
+          letter-spacing: 0.5px;
+          margin-bottom: 6px;
+      }
+      .profile-nav-btn {
+          background: rgba(14, 16, 21, 0.6) !important;
+          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          color: #f1f5f9 !important;
+          border-radius: 30px !important;
+          padding: 10px 20px !important;
+          font-size: 0.85rem !important;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          margin: 6px 0;
+          width: 100%;
+          text-align: center;
+          display: block;
+          text-decoration: none;
+      }
+      .profile-nav-btn:hover, .profile-nav-btn.active-tab {
+          background: linear-gradient(135deg, #d4af37, #aa841c) !important;
+          color: #08090c !important;
+          border-color: rgba(212, 175, 55, 0.4) !important;
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+          transform: translateY(-2px);
+      }
+      .btn-luxury-primary {
+          background: linear-gradient(135deg, #d4af37, #aa841c) !important;
+          border: none !important;
+          color: #08090c !important;
+          font-weight: 700 !important;
+          border-radius: 12px !important;
+          padding: 10px 24px !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+          text-decoration: none;
+          display: inline-block;
+      }
+      .btn-luxury-primary:hover {
+          transform: translateY(-2px);
+          background: linear-gradient(135deg, #e5c158, #c5a059) !important;
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+          color: #08090c !important;
+      }
+      .btn-luxury-outline {
+          background: transparent !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          color: #f1f5f9 !important;
+          border-radius: 30px !important;
+          padding: 8px 18px !important;
+          font-size: 0.85rem !important;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          transition: all 0.3s ease !important;
+      }
+      .btn-luxury-outline:hover {
+          border-color: #d4af37 !important;
+          color: #d4af37 !important;
+          transform: translateY(-2px);
+      }
+    </style>
+</head>
+<body>
+<section>
+   <!--navbar-->
+   <div class="container-fluid p-0">
+     <!---first child-->
+     <nav class="navbar navbar-expand-lg navbar-light bg-info">
+       <div class="container-fluid">
+         <img src="../image/logo.png" alt="" class="logo">
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+             <li class="nav-item">
+               <a class="nav-link" aria-current="page" href="../index.html">Home</a> 
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="../display_all.html">products</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="profile.html">My Account</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="../contact.html">contact</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="../cart.html"><i class='fa-solid fa-cart-shopping'></i><sup id="cart-item-count">0</sup></a>
+             </li>
+           </ul>
+           <a class="nav-link ms-2" href="../admin_area/index.html" id="admin-area-link" style="display:none;">
+             <i class="fa-solid fa-user-shield">Admin area</i>
+           </a>
+         </div>
+       </div>
+     </nav>
+
+     <!--second child-->
+     <nav class="navbar navbar-expand-lg navbar-dark bg-blue">
+         <ul class="navbar-nav me-auto">
+             <li class="nav-item">
+                 <a class="nav-link" href="#" id="welcome-message">Welcome Guest</a>
+             </li>
+             <li class="nav-item" id="login-logout-nav">
+                 <a class="nav-link" href="user_login.html">Login</a>
+             </li>
+         </ul>
+     </nav>
+
+     <!--third child-->
+     <div class="bg-blue text-light">
+         <h3 class="text-center"> &/Home page\&</h3>
+         <p class="text-center">Communication is at the heart of e-commerce and community</p>
+     </div>
+
+     <!--fourth child-->
+     <div class="row m-0 p-4">
+         <div class="col-md-3 col-lg-2 mb-4">
+             <div class="profile-card text-center">
+                 <h4 class="text-light mb-3" style="color: #d4af37 !important; text-transform: uppercase; font-size: 1rem; letter-spacing: 1px;">Your Profile</h4>
+                 <div class="py-3 mb-3">
+                     <img id="profile-pic" src="" class="profile_img" alt="Profile Picture" onerror="handleProfilePicError(this)">
+                 </div>
+                 <a class="profile-nav-btn" href="#" onclick="showSection('pending')">Pending orders</a>
+                 <a class="profile-nav-btn" href="#" onclick="showSection('edit')">Edit Account</a>
+                 <a class="profile-nav-btn" href="#" onclick="showSection('orders')">My Orders</a>
+                 <a class="profile-nav-btn" href="#" onclick="showSection('delete')">Delete Account</a>
+                 <a class="profile-nav-btn" href="#" onclick="handleLogout()">Logout</a>
+             </div>
+         </div>
+         <div class="col-md-9 col-lg-10 text-center text-light" id="profile-content-container">
+             <!-- Dynamic content goes here -->
+         </div>
+     </div>
+
+     <!--footer-->
+     <div class="bg-info p-3 text-center mt-5 text-dark">
+         <p>reserved Designd by aman(vgu24ons2bca****)</p>
+     </div>
+   </div>
+</section>
+
+<!-- Import Firebase and database layer -->
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<script src="../data.js"></script>
+<script>
+    let user = null;
+
+    async function initPage() {
+        // Wait for cloud database to initialize
+        await dbInit();
+
+        // Enforce login
+        user = getLoggedInUser();
+        if (!user) {
+            window.location.href = "user_login.html";
+            return;
+        }
+        if (user.role === "admin" || user.role === "superadmin") {
+            window.location.href = "../admin_area/index.html";
+            return;
+        }
+
+        // Set welcome texts and image
+        let profilePicSrc = 'user_images/default.png';
+        if (user.user_image) {
+            if (user.user_image.startsWith('data:image')) {
+                profilePicSrc = user.user_image;
+            } else {
+                profilePicSrc = `user_images/${user.user_image}`;
+            }
+        }
+        const welcomeMsg = document.getElementById("welcome-message");
+        if (welcomeMsg) {
+            welcomeMsg.innerText = `Welcome ${user.username}`;
+        }
+        document.getElementById("login-logout-nav").innerHTML = `<a class="nav-link" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>`;
+        
+        document.getElementById("profile-pic").src = profilePicSrc;
+        document.getElementById("cart-item-count").innerText = getCartCount();
+
+        // Show Admin Area link if applicable
+        const adminAreaLink = document.getElementById("admin-area-link");
+        if ((user.role === "admin" || user.role === "superadmin") && adminAreaLink) {
+            adminAreaLink.style.display = "block";
+        }
+
+        // Default section to show
+        showSection('pending');
+    }
+
+    function handleLogout() {
+        logoutUser();
+        window.location.href = "../index.html";
+    }
+
+    function handleProfilePicError(img) {
+        img.onerror = null; // Prevent infinite loops
+        const name = user ? user.username : 'User';
+        img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=d4af37&color=000&size=128&bold=true`;
+    }
+
+    function previewEditImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('edit-preview-pic').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Routing sections
+    function showSection(sectionName) {
+        if (!user) return;
+        const container = document.getElementById("profile-content-container");
+
+        // Highlight active link in sidebar
+        const buttons = document.querySelectorAll(".profile-nav-btn");
+        buttons.forEach(btn => {
+            if (btn.getAttribute("onclick").includes(`'${sectionName}'`)) {
+                btn.classList.add("active-tab");
+            } else {
+                btn.classList.remove("active-tab");
+            }
+        });
+
+        if (sectionName === 'pending') {
+            const allOrders = getOrders();
+            // Filter user orders that are pending
+            const userPendingOrders = allOrders.filter(o => o.username === user.username && o.order_status === 'pending');
+            const pendingCount = userPendingOrders.length;
+
+            if (pendingCount > 0) {
+                container.innerHTML = `
+                    <div class="form-glass-card w-75 mx-auto mt-4 text-center">
+                        <h3 class='text-success mb-2' style="font-weight: 700;">You have <span class='text-danger'>${pendingCount}</span> pending orders</h3>
+                        <p class='mt-4'><a href='#' onclick="showSection('orders')" class='btn btn-luxury-primary px-4 py-2'>View Order Details</a></p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="form-glass-card w-75 mx-auto mt-4 text-center">
+                        <h3 class='text-success mb-2' style="font-weight: 700;">You have <span style="color: #d4af37;">Zero</span> pending orders</h3>
+                        <p class='mt-4'><a href='../index.html' class='btn btn-luxury-primary px-4 py-2'>Explore products</a></p>
+                    </div>
+                `;
+            }
+        } 
+        
+        else if (sectionName === 'edit') {
+            let editPicSrc = 'user_images/default.png';
+            if (user.user_image) {
+                if (user.user_image.startsWith('data:image')) {
+                    editPicSrc = user.user_image;
+                } else {
+                    editPicSrc = `user_images/${user.user_image}`;
+                }
+            }
+            container.innerHTML = `
+                <div class="form-glass-card w-75 mx-auto mt-3">
+                    <h3 class="text-center mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">Edit Account</h3>
+                    <form id="edit-form" onsubmit="handleProfileUpdate(event)">
+                        <div class="form-outline mb-3 text-start">
+                            <label class="form-label-luxury">Username</label>
+                            <input type="text" id="edit-username" class="form-control form-control-luxury w-100" value="${user.username}" required placeholder="Username">
+                        </div>
+                        <div class="form-outline mb-3 text-start">
+                            <label class="form-label-luxury">Email Address</label>
+                            <input type="email" id="edit-email" class="form-control form-control-luxury w-100" value="${user.user_email}" required placeholder="Email">
+                        </div>
+                        <div class="form-outline mb-3 text-start">
+                            <label class="form-label-luxury">Profile Image</label>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <input type="file" id="edit-image" class="form-control form-control-luxury w-75 m-0" onchange="previewEditImage(this)">
+                                <img id="edit-preview-pic" src="${editPicSrc}" alt="" class="profile_image_edit ms-2" onerror="handleProfilePicError(this)">
+                            </div>
+                        </div>
+                        <div class="form-outline mb-3 text-start">
+                            <label class="form-label-luxury">Address</label>
+                            <input type="text" id="edit-address" class="form-control form-control-luxury w-100" value="${user.user_address}" required placeholder="Address">
+                        </div>
+                        <div class="form-outline mb-4 text-start">
+                            <label class="form-label-luxury">Mobile</label>
+                            <input type="text" id="edit-mobile" class="form-control form-control-luxury w-100" value="${user.user_mobile}" required placeholder="Mobile">
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" class="btn btn-luxury-primary w-100" value="Update Profile">
+                        </div>
+                    </form>
+                </div>
+            `;
+        } 
+        
+        else if (sectionName === 'orders') {
+            const allOrders = getOrders();
+            const userOrders = allOrders.filter(o => o.username === user.username);
+
+            let tableRows = "";
+            if (userOrders.length === 0) {
+                tableRows = `<tr><td colspan="7"><h4 class="text-center text-warning p-3">No orders placed yet!</h4></td></tr>`;
+            } else {
+                userOrders.forEach((o, index) => {
+                    let statusBadge = "";
+                    let actionCell = "";
+
+                    if (o.order_status === 'pending') {
+                        statusBadge = `<span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Pending</span>`;
+                        actionCell = `<a href="confirm_payment.html?order_id=${o.order_id}" class="btn btn-luxury-primary btn-sm px-3 py-1 font-weight-bold">Pay Now / Confirm</a>`;
+                    } else if (o.order_status === 'Complete') {
+                        statusBadge = `<span class="badge bg-success px-3 py-2 rounded-pill">Complete (Paid)</span>`;
+                        actionCell = `<span class="badge bg-success px-3 py-2 rounded-pill"><i class="fa-solid fa-circle-check"></i> Paid (${o.payment_mode || 'COD'})</span>`;
+                    } else if (o.order_status === 'Delivered') {
+                        statusBadge = `<span class="badge bg-info text-dark px-3 py-2 rounded-pill">Delivered</span>`;
+                        actionCell = `<span class="badge bg-success px-3 py-2 rounded-pill"><i class="fa-solid fa-truck"></i> Paid (${o.payment_mode || 'COD'})</span>`;
+                    } else if (o.order_status === 'Cancelled') {
+                        statusBadge = `<span class="badge bg-danger px-3 py-2 rounded-pill">Cancelled</span>`;
+                        actionCell = `<span class="badge bg-danger px-3 py-2 rounded-pill"><i class="fa-solid fa-ban"></i> Void</span>`;
+                    } else {
+                        statusBadge = `<span class="badge bg-secondary px-3 py-2 rounded-pill">${o.order_status}</span>`;
+                        actionCell = `<span class="badge bg-secondary px-3 py-2 rounded-pill">N/A</span>`;
+                    }
+
+                    let itemsHtml = '';
+                    if (o.items && Array.isArray(o.items)) {
+                        itemsHtml = o.items.map(item => `
+                            <div class="d-flex align-items-center mb-2 p-1 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.15);">
+                                <img src="../admin_area/product_images/${item.product_Image1}" style="width:35px; height:35px; object-fit:contain; border-radius: 4px; margin-right: 8px; background: rgba(255,255,255,0.05);">
+                                <div class="text-start">
+                                    <div class="fw-bold" style="font-size: 0.85rem; color: var(--text-primary); max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.product_title}">${item.product_title}</div>
+                                    <div style="font-size: 0.75rem; color: var(--accent-gold);">Qty: <strong>${item.quanthy}</strong></div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        itemsHtml = `<span class="badge bg-secondary">Total: ${o.total_products} items</span>`;
+                    }
+
+                    tableRows += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>₹ ${o.amount_due} /-</td>
+                            <td>${itemsHtml}</td>
+                            <td>${o.invoice_number}</td>
+                            <td>${o.order_date}</td>
+                            <td>${statusBadge}</td>
+                            <td>${actionCell}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            container.innerHTML = `
+                <div class="form-glass-card w-100 mt-3 text-start">
+                    <h3 class="mt-2 mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">All My Orders</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-dark text-light border-secondary align-middle text-center">
+                            <thead>
+                                <tr style="background-color: rgba(212, 175, 55, 0.15);">
+                                    <th>Sl no.</th>
+                                    <th>Amount Due</th>
+                                    <th>Products Details</th>
+                                    <th>invoice number</th>
+                                    <th>date</th>
+                                    <th>Order Status</th>
+                                    <th>Payment & Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        } 
+        
+        else if (sectionName === 'delete') {
+            container.innerHTML = `
+                <div class="form-glass-card w-50 mx-auto mt-4 text-center border-danger">
+                    <h3 class="text-danger mb-4" style="font-weight: 700; text-transform: uppercase;">Delete Account</h3>
+                    <p class="mb-4 text-secondary">Are you absolutely sure you want to delete your account? This action is irreversible.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <button class="btn btn-danger px-4 py-2 rounded-pill" onclick="confirmDeleteAccount()">Delete Account</button>
+                        <button class="btn btn-luxury-outline px-4 py-2" onclick="showSection('pending')">Don't Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    async function handleProfileUpdate(e) {
+        e.preventDefault();
+        const usernameVal = document.getElementById("edit-username").value.trim();
+        const emailVal = document.getElementById("edit-email").value.trim();
+        const addressVal = document.getElementById("edit-address").value.trim();
+        const mobileVal = document.getElementById("edit-mobile").value.trim();
+
+        // Image file update
+        const fileInput = document.getElementById("edit-image");
+        let newImage = user.user_image;
+        if (fileInput.files[0]) {
+            try {
+                newImage = await compressAndResizeImage(fileInput.files[0], 150, 150);
+            } catch (err) {
+                console.error("Error compressing image:", err);
+                newImage = fileInput.files[0].name;
+            }
+        }
+
+        const updatedData = {
+            username: usernameVal,
+            user_email: emailVal,
+            user_address: addressVal,
+            user_mobile: mobileVal,
+            user_image: newImage,
+            role: user.role || 'user',
+            user_password: user.user_password
+        };
+
+        try {
+            if (usernameVal !== user.username) {
+                // Check if new username is already taken
+                const userDoc = await db.collection("users").doc(usernameVal).get();
+                if (userDoc.exists) {
+                    alert("Username already taken!");
+                    return;
+                }
+                
+                // Write new document under new doc ID and delete old doc ID
+                await db.collection("users").doc(usernameVal).set(updatedData);
+                await db.collection("users").doc(user.username).delete();
+
+                // Update username in all their orders as well
+                const ordersSnapshot = await db.collection("orders").where("username", "==", user.username).get();
+                for (const doc of ordersSnapshot.docs) {
+                    await doc.ref.update({ username: usernameVal });
+                }
+            } else {
+                await cloudUpdateUser(user.username, updatedData);
+            }
+
+            alert("Account updated successfully! Please login again.");
+            logoutUser();
+            window.location.href = "user_login.html";
+        } catch (err) {
+            console.error("Error updating profile:", err);
+            alert("Failed to update profile. Please try again.");
+        }
+    }
+
+    async function confirmDeleteAccount() {
+        if (confirm("Are you sure you want to delete your account? This will permanently delete your orders as well.")) {
+            try {
+                await cloudDeleteUser(user.username);
+                alert("Account Deleted successfully");
+                logoutUser();
+                window.location.href = "../index.html";
+            } catch (err) {
+                console.error("Error deleting account:", err);
+                alert("Failed to delete account. Please try again.");
+            }
+        }
+    }
+
+    // Initialize page database layer
+    initPage();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

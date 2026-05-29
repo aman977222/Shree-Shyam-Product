@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>checkout page</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome link-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!--css file link-->
+    <link rel="stylesheet" href="../style.css">
+     <style>
+      body{
+      overflow-x:hidden;
+      }
+      section {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(8, 9, 12, 0.96), rgba(18, 19, 26, 0.98)), url('../image/background.jpg') no-repeat;
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+      }
+      .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+      }
+      .payment-option-card {
+          background: rgba(18, 20, 26, 0.7) !important;
+          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          border-radius: 20px !important;
+          backdrop-filter: blur(16px);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      }
+      .payment-option-card:hover {
+          transform: translateY(-8px);
+          border-color: rgba(212, 175, 55, 0.5) !important;
+          box-shadow: 0 15px 35px rgba(212, 175, 55, 0.2) !important;
+      }
+      .payment_img {
+          width: 100%;
+          max-width: 200px;
+          height: 120px;
+          object-fit: contain;
+          border-radius: 12px;
+          border: 2px solid rgba(212, 175, 55, 0.25);
+          padding: 8px;
+          background: rgba(18, 20, 26, 0.5);
+          transition: all 0.3s ease;
+      }
+      .payment-option-card:hover .payment_img {
+          border-color: #d4af37;
+          background: #ffffff;
+          transform: scale(1.05);
+      }
+    </style>
+</head>
+<body>
+<section>
+   <!--navbar-->
+   <div class="container-fluid p-0">
+     <!---first child-->
+     <nav class="navbar navbar-expand-lg navbar-light bg-info">
+       <div class="container-fluid">
+         <img src="../image/logo.png" alt="" class="logo">
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+         </button>
+         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+             <li class="nav-item">
+               <a class="nav-link" aria-current="page" href="../index.html">Home</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="../display_all.html">products</a>
+             </li>
+             <li class="nav-item">
+               <a class="nav-link" href="../contact.html">contact</a>
+             </li>
+           </ul>
+         </div>
+       </div>
+     </nav>
+
+     <!--second child-->
+     <nav class="navbar navbar-expand-lg navbar-dark bg-blue">
+         <ul class="navbar-nav me-auto">
+             <li class="nav-item">
+                 <a class="nav-link" href="#" id="welcome-message">Welcome Guest</a>
+             </li>
+             <li class="nav-item" id="login-logout-nav">
+                 <a class="nav-link" href="user_login.html">Login</a>
+             </li>
+         </ul>
+     </nav>
+
+     <!--third child-->
+     <div class="bg-blue text-light">
+         <h3 class="text-center"> &/Home page\&</h3>
+         <p class="text-center">Communication is at the heart of e-commerce and community</p>
+     </div>
+
+     <!--fourth child-->
+     <div class="container py-5 text-light">
+         <h2 class="text-center mb-5" style="color: #d4af37; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Select <span class="text-light">Payment Option</span></h2>
+                   <div class="row d-flex justify-content-center align-items-stretch g-4 w-75 mx-auto">
+              <div class="col-md-6">
+                  <div class="card h-100 text-center p-4 payment-option-card">
+                      <a href="#" onclick="handlePlaceOrder(event, 'COD')" class="text-decoration-none text-light d-flex flex-column align-items-center justify-content-between h-100">
+                          <img src="../image/cod.png" alt="Cash on Delivery" class="payment_img mb-3">
+                          <div>
+                              <h3 style="color: #d4af37; font-weight: 600; font-size: 1.3rem;">Cash on Delivery</h3>
+                              <p class="text-secondary small px-3">Pay with cash when your products are delivered right to your doorstep.</p>
+                          </div>
+                      </a>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="card h-100 text-center p-4 payment-option-card">
+                      <a href="#" onclick="handlePlaceOrder(event, 'Online')" class="text-decoration-none text-light d-flex flex-column align-items-center justify-content-between h-100">
+                          <img src="../image/payment.png" alt="Online Payment" class="payment_img mb-3">
+                          <div>
+                              <h3 style="color: #d4af37; font-weight: 600; font-size: 1.3rem;">Online Payment</h3>
+                              <p class="text-secondary small px-3">Pay instantly online using UPI, Credit/Debit cards, or Net Banking options.</p>
+                          </div>
+                      </a>
+                  </div>
+              </div>
+          </div>
+     </div>
+
+     <!--footer-->
+     <div class="bg-info p-3 text-center mt-5 text-dark">
+         <p>reserved Designd by aman(vgu24ons2bca****)</p>
+     </div>
+   </div>
+</section>
+
+<!-- Import Firebase and database layer -->
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<script src="../data.js"></script>
+<script>
+    let user = null;
+
+    async function initPage() {
+        // Wait for cloud database to initialize
+        await dbInit();
+
+        // Enforce login
+        user = getLoggedInUser();
+        if (!user) {
+            window.location.href = "user_login.html";
+            return;
+        } else {
+            document.getElementById("welcome-message").innerText = `Welcome ${user.username}`;
+            document.getElementById("login-logout-nav").innerHTML = `<a class="nav-link" href="#" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>`;
+        }
+    }
+
+    function handleLogout() {
+        logoutUser();
+        window.location.href = "../index.html";
+    }
+
+    async function handlePlaceOrder(e, payMode) {
+        e.preventDefault();
+        const cart = getCart();
+        if (cart.length === 0) {
+            alert("Your cart is empty!");
+            window.location.href = "../index.html";
+            return;
+        }
+
+        const totalAmt = getCartTotal();
+        const totalItems = getCartCount();
+
+        const products = getProducts();
+        const items = cart.map(item => {
+            const prod = products.find(p => p.product_id === item.product_id);
+            return {
+                product_id: item.product_id,
+                quanthy: item.quanthy,
+                product_title: prod ? prod.product_title : 'Unknown Product',
+                product_Image1: prod ? prod.product_Image1 : ''
+            };
+        });
+
+        const orderData = {
+            username: user.username,
+            amount_due: totalAmt,
+            total_products: totalItems,
+            payment_mode: payMode,
+            items: items
+        };
+
+        try {
+            const newOrder = await createOrder(orderData);
+            if (payMode === 'COD') {
+                alert(`Order successfully placed! Your invoice number is: ${newOrder.invoice_number}`);
+                window.location.href = "profile.html";
+            } else {
+                alert(`Order successfully placed! Redirecting you to complete your online payment.`);
+                window.location.href = `confirm_payment.html?order_id=${newOrder.order_id}`;
+            }
+        } catch (err) {
+            console.error("Error creating order:", err);
+            alert("Failed to place order. Please try again.");
+        }
+    }
+
+    // Initialize page database layer
+    initPage();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
+

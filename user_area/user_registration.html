@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>user registration</title>
+    <!--bootstrap css link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--css file link-->
+    <link rel="stylesheet" href="../style.css">
+     <style>
+      body{
+      overflow-x:hidden;
+      }
+      section {
+          min-height: 100vh;
+          background: linear-gradient(135deg, rgba(8, 9, 12, 0.96), rgba(18, 19, 26, 0.98)), url('../image/background.jpg') no-repeat;
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      .glass-card {
+          background: rgba(18, 20, 26, 0.65) !important;
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          border-radius: 24px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+          padding: 40px;
+          margin-top: 20px;
+          animation: luxuryEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      .form-control-luxury {
+          background: rgba(8, 9, 12, 0.5) !important;
+          border: 1px solid rgba(212, 175, 55, 0.25) !important;
+          color: #f1f5f9 !important;
+          border-radius: 12px;
+          padding: 12px 18px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .form-control-luxury:focus {
+          background: rgba(8, 9, 12, 0.85) !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 15px rgba(212, 175, 55, 0.25) !important;
+          color: #ffffff !important;
+          outline: none;
+      }
+      .form-control-luxury::placeholder {
+          color: #64748b !important;
+      }
+      .form-label-luxury {
+          color: #d4af37 !important;
+          font-weight: 600;
+          font-size: 0.9rem;
+          letter-spacing: 0.5px;
+          margin-bottom: 8px;
+      }
+      .btn-luxury-primary {
+          background: linear-gradient(135deg, #d4af37, #aa841c) !important;
+          border: none !important;
+          color: #08090c !important;
+          font-weight: 700 !important;
+          border-radius: 12px !important;
+          padding: 12px 24px !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+      }
+      .btn-luxury-primary:hover {
+          transform: translateY(-2px);
+          background: linear-gradient(135deg, #e5c158, #c5a059) !important;
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+      }
+      .btn-luxury-secondary {
+          background: transparent !important;
+          border: 1px solid rgba(255, 255, 255, 0.2) !important;
+          color: #f1f5f9 !important;
+          border-radius: 12px !important;
+          padding: 12px 24px !important;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          transition: all 0.3s ease;
+      }
+      .btn-luxury-secondary:hover {
+          border-color: #d4af37 !important;
+          color: #d4af37 !important;
+          transform: translateY(-2px);
+      }
+    </style>
+</head>
+<body>
+    <section>
+        <div class="container py-5">
+            <h2 class="text-center text-light mb-4">New User Registration</h2>
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-lg-10 col-xl-8">
+                    <div class="glass-card mb-5">
+                        <form id="registration-form" onsubmit="handleRegistrationSubmit(event)">
+                            <!-- username field-->
+                            <div class="form-outline mb-3">
+                                <label for="user_username" class="form-label-luxury">Username</label>
+                                <input type="text" id="user_username" class="form-control form-control-luxury" placeholder="Enter your username" autocomplete="off" required name="user_username">
+                            </div>
+                            <!-- email field-->
+                            <div class="form-outline mb-3">
+                                <label for="user_email" class="form-label-luxury">Email</label>
+                                <input type="email" id="user_email" class="form-control form-control-luxury" placeholder="Enter your email" autocomplete="off" required name="user_email">
+                            </div>
+                            <!-- image field-->
+                            <div class="form-outline mb-3">
+                                <label for="user_image" class="form-label-luxury">User Image</label>
+                                <input type="file" id="user_image" class="form-control form-control-luxury" required name="user_image" accept="image/*">
+                            </div>
+                            <!-- password field-->
+                            <div class="form-outline mb-3">
+                                <label for="user_password" class="form-label-luxury">Password</label>
+                                <input type="password" id="user_password" class="form-control form-control-luxury" placeholder="Enter your password" autocomplete="off" required name="user_password">
+                            </div>
+                            <!-- confirm password field-->
+                            <div class="form-outline mb-3">
+                                <label for="conf_user_password" class="form-label-luxury">Confirm Password</label>
+                                <input type="password" id="conf_user_password" class="form-control form-control-luxury" placeholder="Enter your confirm password" autocomplete="off" required name="conf_user_password">
+                            </div>
+                            <!-- Address field-->
+                            <div class="form-outline mb-3">
+                                <label for="user_address" class="form-label-luxury">Address</label>
+                                <input type="text" id="user_address" class="form-control form-control-luxury" placeholder="Enter your Address" autocomplete="off" required name="user_address">
+                            </div>
+                            <!-- contact field-->
+                            <div class="form-outline mb-4">
+                                <label for="user_mobile" class="form-label-luxury">Contact Number</label>
+                                <input type="text" id="user_mobile" class="form-control form-control-luxury" placeholder="Enter your mobile number" autocomplete="off" required name="user_mobile">
+                            </div>
+                            <!-- login link-->
+                            <div class="mt-4 pt-2 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                <div>
+                                    <input type="submit" value="Register" class="btn-luxury-primary">
+                                    <a href="../index.html" class="btn-luxury-secondary text-decoration-none ms-2">Go Home</a>
+                                </div>
+                                <p class="text-light fw-bold mb-0">Already have an account? <a href="user_login.html" class="text-info text-decoration-none ms-1">Login</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Import Firebase and database layer -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="../data.js"></script>
+    <script>
+        async function initPage() {
+            await dbInit();
+        }
+
+        async function handleRegistrationSubmit(e) {
+            e.preventDefault();
+            const username = document.getElementById("user_username").value;
+            const email = document.getElementById("user_email").value;
+            const password = document.getElementById("user_password").value;
+            const confPassword = document.getElementById("conf_user_password").value;
+            const address = document.getElementById("user_address").value;
+            const mobile = document.getElementById("user_mobile").value;
+
+            // Get uploaded image (compress to base64)
+            const imageFile = document.getElementById("user_image").files[0];
+            let userImage = "user_default.png";
+            if (imageFile) {
+                try {
+                    userImage = await compressAndResizeImage(imageFile, 150, 150);
+                } catch (err) {
+                    console.error("Error compressing image:", err);
+                    userImage = imageFile.name;
+                }
+            }
+
+            if (password !== confPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            const newUser = {
+                username: username,
+                user_email: email,
+                user_password: password,
+                user_image: userImage,
+                user_address: address,
+                user_mobile: mobile
+            };
+
+            const res = await registerUser(newUser);
+            if (res.success) {
+                alert("Registration successful!");
+                
+                // Re-initialize db cache to fetch the newly created user
+                await dbInit();
+                
+                // Check if user has items in cart
+                const cart = getCart();
+                if (cart.length > 0) {
+                    // Auto login
+                    await loginUser(username, password);
+                    window.location.href = "checkout.html";
+                } else {
+                    window.location.href = "user_login.html";
+                }
+            } else {
+                alert(res.message);
+            }
+        }
+
+        // Initialize page
+        initPage();
+    </script>
+</body>
+</html>
