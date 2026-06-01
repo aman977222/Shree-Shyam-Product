@@ -177,17 +177,41 @@
         const brandsContainer = document.getElementById("brands-container");
         const categoriesContainer = document.getElementById("categories-container");
 
+        const isAdmin = user && (user.role === "admin" || user.role === "superadmin");
+
+        brandsContainer.innerHTML = "";
         brands.forEach(b => {
+            let adminControls = "";
+            if (isAdmin) {
+                adminControls = `
+                    <div class="d-flex justify-content-center gap-2 mb-2 px-3">
+                        <button onclick="handleEditBrandHome(${b.Brands_id})" class="btn btn-warning btn-sm text-dark py-1 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="handleDeleteBrandHome(${b.Brands_id})" class="btn btn-danger btn-sm py-1 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            }
             brandsContainer.innerHTML += `
-                <li class='nav-item'>
-                    <a href='index.html?brand=${b.Brands_id}' class='nav-link bg-white text-center border-bottom py-2'>${b.Brands_title}</a>
+                <li class='nav-item mb-2'>
+                    <a href='index.html?brand=${b.Brands_id}' class='nav-link bg-white text-center border-bottom py-2 m-0'>${b.Brands_title}</a>
+                    ${adminControls}
                 </li>`;
         });
 
+        categoriesContainer.innerHTML = "";
         categories.forEach(c => {
+            let adminControls = "";
+            if (isAdmin) {
+                adminControls = `
+                    <div class="d-flex justify-content-center gap-2 mb-2 px-3">
+                        <button onclick="handleEditCategoryHome(${c.categories_id})" class="btn btn-warning btn-sm text-dark py-1 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="handleDeleteCategoryHome(${c.categories_id})" class="btn btn-danger btn-sm py-1 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            }
             categoriesContainer.innerHTML += `
-                <li class='nav-item'>
-                    <a href='index.html?category=${c.categories_id}' class='nav-link bg-white text-center border-bottom py-2'>${c.categories_title}</a>
+                <li class='nav-item mb-2'>
+                    <a href='index.html?category=${c.categories_id}' class='nav-link bg-white text-center border-bottom py-2 m-0'>${c.categories_title}</a>
+                    ${adminControls}
                 </li>`;
         });
 
@@ -205,7 +229,17 @@
         if (products.length === 0) {
             productsContainer.innerHTML = `<h2 class='text-center text-light mt-5'>No results match. No products found for this search!</h2>`;
         } else {
+            productsContainer.innerHTML = "";
             products.forEach(p => {
+                let adminButtons = "";
+                if (isAdmin) {
+                    adminButtons = `
+                        <div class="mt-3 pt-2 border-top border-secondary d-flex justify-content-center gap-2">
+                            <button onclick="handleEditProductHome(${p.product_id})" class="btn btn-warning btn-sm text-dark px-3"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                            <button onclick="handleDeleteProductHome(${p.product_id})" class="btn btn-danger btn-sm px-3"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div>
+                    `;
+                }
                 productsContainer.innerHTML += `
                     <div class='col-md-4 mb-4'>
                         <div class='card shadow-sm'>
@@ -216,6 +250,7 @@
                                 <p class='card-text fw-bold'>Price: ${p.product_price}/-</p>
                                 <a href='#' onclick="handleAddToCart(${p.product_id})" class='btn btn-info px-3 me-2'>ADD to cart</a>
                                 <a href='product_details.html?product_id=${p.product_id}' class='btn btn-secondary px-3'>view more</a>
+                                ${adminButtons}
                             </div>
                         </div>
                     </div>`;

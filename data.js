@@ -412,6 +412,23 @@ async function loginUser(username, password) {
     return { success: false, message: "Invalid username or password!" };
 }
 
+function validatePasswordStrength(password) {
+    if (password.length < 8) {
+        return { isValid: false, message: "Password must be at least 8 characters long!" };
+    }
+    if (!/^[a-zA-Z]/.test(password)) {
+        return { isValid: false, message: "Password must start with a letter!" };
+    }
+    if (!/[0-9]$/.test(password)) {
+        return { isValid: false, message: "Password must end with a number!" };
+    }
+    const middlePart = password.substring(1, password.length - 1);
+    if (!middlePart.includes('@')) {
+        return { isValid: false, message: "Password must contain '@' in the middle (not as start or end)!" };
+    }
+    return { isValid: true };
+}
+
 async function registerUser(userData) {
     clearDatabaseCache();
     const userDoc = await db.collection("users").doc(userData.username).get();
@@ -507,12 +524,22 @@ async function cloudInsertProduct(p) {
     await db.collection("products").doc(p.product_id.toString()).set(p);
 }
 
+async function cloudUpdateProduct(p) {
+    clearDatabaseCache();
+    await db.collection("products").doc(p.product_id.toString()).set(p);
+}
+
 async function cloudDeleteProduct(id) {
     clearDatabaseCache();
     await db.collection("products").doc(id.toString()).delete();
 }
 
 async function cloudInsertCategory(c) {
+    clearDatabaseCache();
+    await db.collection("categories").doc(c.categories_id.toString()).set(c);
+}
+
+async function cloudUpdateCategory(c) {
     clearDatabaseCache();
     await db.collection("categories").doc(c.categories_id.toString()).set(c);
 }
@@ -527,9 +554,268 @@ async function cloudInsertBrand(b) {
     await db.collection("brands").doc(b.Brands_id.toString()).set(b);
 }
 
+async function cloudUpdateBrand(b) {
+    clearDatabaseCache();
+    await db.collection("brands").doc(b.Brands_id.toString()).set(b);
+}
+
 async function cloudDeleteBrand(id) {
     clearDatabaseCache();
     await db.collection("brands").doc(id.toString()).delete();
+}
+
+// Global Modal & Action Handlers for Homepage Edit/Delete (Admins & Superadmins)
+function showHomepageEditModal(title, formHtml, onSubmitCallback) {
+    const existing = document.getElementById("homepage-edit-modal");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "homepage-edit-modal";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.background = "rgba(8, 9, 12, 0.85)";
+    overlay.style.backdropFilter = "blur(8px)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "10000";
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 0.3s ease";
+
+    overlay.innerHTML = `
+        <div class="form-glass-card shadow-lg p-4" style="max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; border: 2px solid var(--accent-gold); border-radius: 20px; background: var(--bg-card); color: var(--text-primary);">
+            <h3 class="text-center mb-4" style="color: var(--accent-gold); font-weight: 700; font-family: 'Playfair Display', serif;">${title}</h3>
+            <form id="modal-edit-form">
+                ${formHtml}
+                <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn-luxury-primary px-4 py-2 text-dark" style="border-radius: 12px; font-weight:700; border:none; background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));">Save Changes</button>
+                    <button type="button" class="btn-luxury-outline px-4 py-2" style="border-radius: 12px; border: 1px solid var(--border-color); background:transparent; color:var(--text-primary);" onclick="document.getElementById('homepage-edit-modal').remove()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.style.opacity = "1", 10);
+
+    const form = overlay.querySelector("#modal-edit-form");
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        await onSubmitCallback(form);
+        overlay.remove();
+    });
+}
+
+async function handleEditProductHome(id) {
+    const products = getProducts();
+    const p = products.find(prod => prod.product_id === id);
+    if (!p) return;
+
+    const cats = getCategories();
+    const brs = getBrands();
+
+    const formHtml = `
+        <div class="form-outline mb-3">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Title</label>
+            <input type="text" id="edit-modal-title" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" value="${p.product_title}" required>
+        </div>
+        <div class="form-outline mb-3">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Description</label>
+            <input type="text" id="edit-modal-desc" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" value="${p.product_description}" required>
+        </div>
+        <div class="form-outline mb-3">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Keywords</label>
+            <input type="text" id="edit-modal-keywords" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" value="${p.product_keywords}" required>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-outline mb-3">
+                <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Category</label>
+                <select id="edit-modal-category" class="form-select form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" required>
+                    ${cats.map(c => `<option value="${c.categories_id}" style="background: #12141a; color: #fff;" ${c.categories_id === p.category_id ? 'selected' : ''}>${c.categories_title}</option>`).join('')}
+                </select>
+            </div>
+            <div class="col-md-6 form-outline mb-3">
+                <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Brand</label>
+                <select id="edit-modal-brand" class="form-select form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" required>
+                    ${brs.map(b => `<option value="${b.Brands_id}" style="background: #12141a; color: #fff;" ${b.Brands_id === p.brand_id ? 'selected' : ''}>${b.Brands_title}</option>`).join('')}
+                </select>
+            </div>
+        </div>
+        <div class="form-outline mb-3">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Image 1 (Current: ${p.product_Image1})</label>
+            <input type="file" id="edit-modal-img1" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;">
+        </div>
+        <div class="form-outline mb-3">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Image 2 (Current: ${p.product_Image2})</label>
+            <input type="file" id="edit-modal-img2" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;">
+        </div>
+        <div class="form-outline mb-3">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Image 3 (Current: ${p.product_Image3})</label>
+            <input type="file" id="edit-modal-img3" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;">
+        </div>
+        <div class="form-outline mb-4">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Price (₹)</label>
+            <input type="number" id="edit-modal-price" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" value="${p.product_price}" required>
+        </div>
+    `;
+
+    showHomepageEditModal("Edit Product", formHtml, async (form) => {
+        const title = form.querySelector("#edit-modal-title").value;
+        const desc = form.querySelector("#edit-modal-desc").value;
+        const keywords = form.querySelector("#edit-modal-keywords").value;
+        const category = form.querySelector("#edit-modal-category").value;
+        const brand = form.querySelector("#edit-modal-brand").value;
+        const price = form.querySelector("#edit-modal-price").value;
+
+        const img1File = form.querySelector("#edit-modal-img1").files[0];
+        const img2File = form.querySelector("#edit-modal-img2").files[0];
+        const img3File = form.querySelector("#edit-modal-img3").files[0];
+
+        const updatedProduct = {
+            product_id: id,
+            product_title: title,
+            product_description: desc,
+            product_keywords: keywords,
+            category_id: parseInt(category),
+            brand_id: parseInt(brand),
+            product_Image1: img1File ? img1File.name : p.product_Image1,
+            product_Image2: img2File ? img2File.name : p.product_Image2,
+            product_Image3: img3File ? img3File.name : p.product_Image3,
+            product_price: parseInt(price)
+        };
+
+        try {
+            await cloudUpdateProduct(updatedProduct);
+            await dbInit();
+            alert("Product updated successfully!");
+            window.location.reload();
+        } catch (err) {
+            console.error("Error updating product:", err);
+            alert("Failed to update product.");
+        }
+    });
+}
+
+async function handleDeleteProductHome(id) {
+    const user = getLoggedInUser();
+    if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        alert("Only admin/superadmin can delete products!");
+        return;
+    }
+    if (confirm("Are you sure you want to delete this product?")) {
+        try {
+            await cloudDeleteProduct(id);
+            await dbInit();
+            alert("Product deleted successfully!");
+            window.location.reload();
+        } catch (err) {
+            console.error("Error deleting product:", err);
+            alert("Failed to delete product.");
+        }
+    }
+}
+
+async function handleEditCategoryHome(id) {
+    const cats = getCategories();
+    const c = cats.find(cat => cat.categories_id === id);
+    if (!c) return;
+
+    const formHtml = `
+        <div class="form-outline mb-4">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Category Title</label>
+            <input type="text" id="edit-modal-cat-title" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" value="${c.categories_title}" required>
+        </div>
+    `;
+
+    showHomepageEditModal("Edit Category", formHtml, async (form) => {
+        const title = form.querySelector("#edit-modal-cat-title").value;
+        const updatedCategory = {
+            categories_id: id,
+            categories_title: title
+        };
+
+        try {
+            await cloudUpdateCategory(updatedCategory);
+            await dbInit();
+            alert("Category updated successfully!");
+            window.location.reload();
+        } catch (err) {
+            console.error("Error updating category:", err);
+            alert("Failed to update category.");
+        }
+    });
+}
+
+async function handleDeleteCategoryHome(id) {
+    const user = getLoggedInUser();
+    if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        alert("Only admin/superadmin can delete categories!");
+        return;
+    }
+    if (confirm("Are you sure you want to delete this category?")) {
+        try {
+            await cloudDeleteCategory(id);
+            await dbInit();
+            alert("Category deleted successfully!");
+            window.location.reload();
+        } catch (err) {
+            console.error("Error deleting category:", err);
+            alert("Failed to delete category.");
+        }
+    }
+}
+
+async function handleEditBrandHome(id) {
+    const brs = getBrands();
+    const b = brs.find(brand => brand.Brands_id === id);
+    if (!b) return;
+
+    const formHtml = `
+        <div class="form-outline mb-4">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Brand Title</label>
+            <input type="text" id="edit-modal-brand-title" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" value="${b.Brands_title}" required>
+        </div>
+    `;
+
+    showHomepageEditModal("Edit Brand", formHtml, async (form) => {
+        const title = form.querySelector("#edit-modal-brand-title").value;
+        const updatedBrand = {
+            Brands_id: id,
+            Brands_title: title
+        };
+
+        try {
+            await cloudUpdateBrand(updatedBrand);
+            await dbInit();
+            alert("Brand updated successfully!");
+            window.location.reload();
+        } catch (err) {
+            console.error("Error updating brand:", err);
+            alert("Failed to update brand.");
+        }
+    });
+}
+
+async function handleDeleteBrandHome(id) {
+    const user = getLoggedInUser();
+    if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        alert("Only admin/superadmin can delete brands!");
+        return;
+    }
+    if (confirm("Are you sure you want to delete this brand?")) {
+        try {
+            await cloudDeleteBrand(id);
+            await dbInit();
+            alert("Brand deleted successfully!");
+            window.location.reload();
+        } catch (err) {
+            console.error("Error deleting brand:", err);
+            alert("Failed to delete brand.");
+        }
+    }
 }
 
 async function cloudDeleteOrder(id) {

@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>user registration</title>
+    <title>User Registration</title>
     <!--bootstrap css link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!--css file link-->
     <link rel="stylesheet" href="../style.css">
-     <style>
-      body{
-      overflow-x:hidden;
-      }
+    <style>
+      body { overflow-x: hidden; }
       section {
           min-height: 100vh;
           background: linear-gradient(135deg, rgba(8, 9, 12, 0.96), rgba(18, 19, 26, 0.98)), url('../image/background.jpg') no-repeat;
@@ -47,9 +47,7 @@
           color: #ffffff !important;
           outline: none;
       }
-      .form-control-luxury::placeholder {
-          color: #64748b !important;
-      }
+      .form-control-luxury::placeholder { color: #64748b !important; }
       .form-label-luxury {
           color: #d4af37 !important;
           font-weight: 600;
@@ -68,6 +66,7 @@
           letter-spacing: 1px;
           transition: all 0.3s ease;
           box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+          cursor: pointer;
       }
       .btn-luxury-primary:hover {
           transform: translateY(-2px);
@@ -89,6 +88,81 @@
           color: #d4af37 !important;
           transform: translateY(-2px);
       }
+
+      /* ── Password Hint Box ── */
+      .password-hint-box {
+          background: rgba(212, 175, 55, 0.06);
+          border: 1px solid rgba(212, 175, 55, 0.22);
+          border-radius: 12px;
+          padding: 14px 18px;
+          margin-top: 10px;
+          font-size: 0.82rem;
+      }
+      .password-hint-box .hint-title {
+          color: #d4af37;
+          font-weight: 700;
+          margin-bottom: 8px;
+          font-size: 0.86rem;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+      }
+      .password-hint-box ul {
+          margin: 0;
+          padding-left: 18px;
+          color: #94a3b8;
+      }
+      .password-hint-box ul li {
+          margin-bottom: 4px;
+          line-height: 1.5;
+      }
+      .password-hint-box ul li span {
+          color: #f1f5f9;
+          font-weight: 600;
+      }
+      .password-hint-box .example-pass {
+          margin-top: 12px;
+          background: rgba(8, 9, 12, 0.6);
+          border: 1px solid rgba(212, 175, 55, 0.2);
+          border-radius: 10px;
+          padding: 10px 16px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-family: 'Courier New', monospace;
+      }
+      .password-hint-box .example-pass .ex-label {
+          color: #64748b;
+          font-size: 0.78rem;
+          font-family: inherit;
+      }
+      .password-hint-box .example-pass .ex-value {
+          color: #d4af37;
+          font-size: 1.05rem;
+          font-weight: 700;
+          letter-spacing: 2px;
+      }
+
+      /* ── Password Strength Bar ── */
+      .strength-bar-wrap {
+          margin-top: 10px;
+          height: 6px;
+          background: rgba(255,255,255,0.07);
+          border-radius: 10px;
+          overflow: hidden;
+      }
+      .strength-bar {
+          height: 100%;
+          border-radius: 10px;
+          width: 0%;
+          transition: width 0.45s ease, background 0.45s ease;
+      }
+      .strength-label {
+          font-size: 0.76rem;
+          margin-top: 5px;
+          font-weight: 600;
+          min-height: 18px;
+      }
     </style>
 </head>
 <body>
@@ -99,49 +173,93 @@
                 <div class="col-lg-10 col-xl-8">
                     <div class="glass-card mb-5">
                         <form id="registration-form" onsubmit="handleRegistrationSubmit(event)">
-                            <!-- username field-->
+
+                            <!-- Username -->
                             <div class="form-outline mb-3">
                                 <label for="user_username" class="form-label-luxury">Username</label>
-                                <input type="text" id="user_username" class="form-control form-control-luxury" placeholder="Enter your username" autocomplete="off" required name="user_username">
+                                <input type="text" id="user_username" class="form-control form-control-luxury"
+                                    placeholder="Enter your username" autocomplete="off" required name="user_username">
                             </div>
-                            <!-- email field-->
+
+                            <!-- Email -->
                             <div class="form-outline mb-3">
                                 <label for="user_email" class="form-label-luxury">Email</label>
-                                <input type="email" id="user_email" class="form-control form-control-luxury" placeholder="Enter your email" autocomplete="off" required name="user_email">
+                                <input type="email" id="user_email" class="form-control form-control-luxury"
+                                    placeholder="Enter your email" autocomplete="off" required name="user_email">
                             </div>
-                            <!-- image field-->
+
+                            <!-- Profile Image -->
                             <div class="form-outline mb-3">
                                 <label for="user_image" class="form-label-luxury">User Image</label>
-                                <input type="file" id="user_image" class="form-control form-control-luxury" required name="user_image" accept="image/*">
+                                <input type="file" id="user_image" class="form-control form-control-luxury"
+                                    required name="user_image" accept="image/*">
                             </div>
-                            <!-- password field-->
+
+                            <!-- Password + Hint + Strength -->
                             <div class="form-outline mb-3">
                                 <label for="user_password" class="form-label-luxury">Password</label>
-                                <input type="password" id="user_password" class="form-control form-control-luxury" placeholder="Enter your password" autocomplete="off" required name="user_password">
+                                <input type="password" id="user_password" class="form-control form-control-luxury"
+                                    placeholder="e.g. Admin@123" autocomplete="off" required name="user_password"
+                                    oninput="checkPasswordStrength(this.value)">
+
+                                <!-- Strength Bar -->
+                                <div class="strength-bar-wrap">
+                                    <div class="strength-bar" id="strength-bar"></div>
+                                </div>
+                                <div class="strength-label" id="strength-label" style="color:#64748b;">Type your password...</div>
+
+                                <!-- Hint Box -->
+                                <div class="password-hint-box">
+                                    <div class="hint-title">
+                                        <i class="fa-solid fa-circle-info"></i> Password Rules:
+                                    </div>
+                                    <ul>
+                                        <li>Kam se kam <span>8 characters</span> hone chahiye</li>
+                                        <li>Shuruat <span>letter</span> se honi chahiye (A–Z ya a–z)</li>
+                                        <li>Beech mein <span>@ symbol</span> hona chahiye</li>
+                                        <li>Ant mein <span>number</span> hona chahiye (0–9)</li>
+                                    </ul>
+                                    <div class="example-pass">
+                                        <i class="fa-solid fa-key" style="color:#d4af37;"></i>
+                                        <span class="ex-label">Example:</span>
+                                        <span class="ex-value">Admin@123</span>
+                                    </div>
+                                </div>
                             </div>
-                            <!-- confirm password field-->
+
+                            <!-- Confirm Password -->
                             <div class="form-outline mb-3">
                                 <label for="conf_user_password" class="form-label-luxury">Confirm Password</label>
-                                <input type="password" id="conf_user_password" class="form-control form-control-luxury" placeholder="Enter your confirm password" autocomplete="off" required name="conf_user_password">
+                                <input type="password" id="conf_user_password" class="form-control form-control-luxury"
+                                    placeholder="Re-enter your password" autocomplete="off" required name="conf_user_password">
                             </div>
-                            <!-- Address field-->
+
+                            <!-- Address -->
                             <div class="form-outline mb-3">
                                 <label for="user_address" class="form-label-luxury">Address</label>
-                                <input type="text" id="user_address" class="form-control form-control-luxury" placeholder="Enter your Address" autocomplete="off" required name="user_address">
+                                <input type="text" id="user_address" class="form-control form-control-luxury"
+                                    placeholder="Enter your Address" autocomplete="off" required name="user_address">
                             </div>
-                            <!-- contact field-->
+
+                            <!-- Mobile (no OTP) -->
                             <div class="form-outline mb-4">
                                 <label for="user_mobile" class="form-label-luxury">Contact Number</label>
-                                <input type="text" id="user_mobile" class="form-control form-control-luxury" placeholder="Enter your mobile number" autocomplete="off" required name="user_mobile">
+                                <input type="text" id="user_mobile" class="form-control form-control-luxury"
+                                    placeholder="Enter your mobile number" autocomplete="off" required name="user_mobile">
                             </div>
-                            <!-- login link-->
+
+                            <!-- Buttons -->
                             <div class="mt-4 pt-2 d-flex align-items-center justify-content-between flex-wrap gap-3">
                                 <div>
                                     <input type="submit" value="Register" class="btn-luxury-primary">
                                     <a href="../index.html" class="btn-luxury-secondary text-decoration-none ms-2">Go Home</a>
                                 </div>
-                                <p class="text-light fw-bold mb-0">Already have an account? <a href="user_login.html" class="text-info text-decoration-none ms-1">Login</a></p>
+                                <p class="text-light fw-bold mb-0">
+                                    Already have an account?
+                                    <a href="user_login.html" class="text-info text-decoration-none ms-1">Login</a>
+                                </p>
                             </div>
+
                         </form>
                     </div>
                 </div>
@@ -149,61 +267,100 @@
         </div>
     </section>
 
-    <!-- Import Firebase and database layer -->
+    <!-- Firebase + Data Layer -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <script src="../data.js"></script>
     <script>
+
         async function initPage() {
             await dbInit();
         }
 
+        // ── Password Strength Live Check ──────────────────────────────────────
+        function checkPasswordStrength(pass) {
+            const bar   = document.getElementById('strength-bar');
+            const label = document.getElementById('strength-label');
+
+            if (!pass) {
+                bar.style.width = '0%';
+                label.style.color = '#64748b';
+                label.textContent = 'Type your password...';
+                return;
+            }
+
+            let score = 0;
+            if (pass.length >= 8)                                              score++;
+            if (/^[a-zA-Z]/.test(pass))                                        score++;
+            if (pass.length > 2 && pass.slice(1, -1).includes('@'))            score++;
+            if (/[0-9]$/.test(pass))                                           score++;
+
+            const levels = [
+                { color: '#ef4444', text: '❌ Bahut Weak' },
+                { color: '#ef4444', text: '❌ Weak' },
+                { color: '#f97316', text: '⚠️ Medium' },
+                { color: '#eab308', text: '🔶 Achha' },
+                { color: '#22c55e', text: '✅ Strong (Mazboot)' },
+            ];
+
+            const lvl = levels[score] || levels[0];
+            bar.style.width   = (score * 25) + '%';
+            bar.style.background = lvl.color;
+            label.style.color = lvl.color;
+            label.textContent = lvl.text;
+        }
+
+        // ── Registration Submit ───────────────────────────────────────────────
         async function handleRegistrationSubmit(e) {
             e.preventDefault();
-            const username = document.getElementById("user_username").value;
-            const email = document.getElementById("user_email").value;
-            const password = document.getElementById("user_password").value;
-            const confPassword = document.getElementById("conf_user_password").value;
-            const address = document.getElementById("user_address").value;
-            const mobile = document.getElementById("user_mobile").value;
 
-            // Get uploaded image (compress to base64)
+            const username    = document.getElementById("user_username").value.trim();
+            const email       = document.getElementById("user_email").value.trim();
+            const password    = document.getElementById("user_password").value;
+            const confPassword= document.getElementById("conf_user_password").value;
+            const address     = document.getElementById("user_address").value.trim();
+            const mobile      = document.getElementById("user_mobile").value.trim();
+
+            // Password match check
+            if (password !== confPassword) {
+                alert("Passwords match nahi ho rahe!");
+                return;
+            }
+
+            // Password strength check
+            const strengthCheck = validatePasswordStrength(password);
+            if (!strengthCheck.isValid) {
+                alert("⚠️ " + strengthCheck.message);
+                return;
+            }
+
+            // Compress profile image
             const imageFile = document.getElementById("user_image").files[0];
             let userImage = "user_default.png";
             if (imageFile) {
                 try {
                     userImage = await compressAndResizeImage(imageFile, 150, 150);
                 } catch (err) {
-                    console.error("Error compressing image:", err);
+                    console.error("Image compress error:", err);
                     userImage = imageFile.name;
                 }
             }
 
-            if (password !== confPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-
             const newUser = {
-                username: username,
-                user_email: email,
+                username:      username,
+                user_email:    email,
                 user_password: password,
-                user_image: userImage,
-                user_address: address,
-                user_mobile: mobile
+                user_image:    userImage,
+                user_address:  address,
+                user_mobile:   mobile
             };
 
             const res = await registerUser(newUser);
             if (res.success) {
-                alert("Registration successful!");
-                
-                // Re-initialize db cache to fetch the newly created user
+                alert("Registration successful! 🎉");
                 await dbInit();
-                
-                // Check if user has items in cart
                 const cart = getCart();
                 if (cart.length > 0) {
-                    // Auto login
                     await loginUser(username, password);
                     window.location.href = "checkout.html";
                 } else {
@@ -214,7 +371,6 @@
             }
         }
 
-        // Initialize page
         initPage();
     </script>
 </body>

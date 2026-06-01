@@ -204,6 +204,7 @@
                  </div>
                  <a class="profile-nav-btn" href="#" onclick="showSection('pending')">Pending orders</a>
                  <a class="profile-nav-btn" href="#" onclick="showSection('edit')">Edit Account</a>
+                 <a class="profile-nav-btn" href="#" onclick="showSection('change_password')">Change Password</a>
                  <a class="profile-nav-btn" href="#" onclick="showSection('orders')">My Orders</a>
                  <a class="profile-nav-btn" href="#" onclick="showSection('delete')">Delete Account</a>
                  <a class="profile-nav-btn" href="#" onclick="handleLogout()">Logout</a>
@@ -469,6 +470,31 @@
                 </div>
             `;
         }
+        
+        else if (sectionName === 'change_password') {
+            container.innerHTML = `
+                <div class="form-glass-card w-50 mx-auto mt-3">
+                    <h3 class="text-center mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">Change Password</h3>
+                    <form id="change-password-form" onsubmit="handlePasswordUpdate(event)">
+                        <div class="form-outline mb-3 text-start">
+                            <label class="form-label-luxury">Current Password</label>
+                            <input type="password" id="current-pass" class="form-control form-control-luxury w-100" required placeholder="Enter current password">
+                        </div>
+                        <div class="form-outline mb-3 text-start">
+                            <label class="form-label-luxury">New Password</label>
+                            <input type="password" id="new-pass" class="form-control form-control-luxury w-100" required placeholder="Enter new password">
+                        </div>
+                        <div class="form-outline mb-4 text-start">
+                            <label class="form-label-luxury">Confirm New Password</label>
+                            <input type="password" id="confirm-new-pass" class="form-control form-control-luxury w-100" required placeholder="Confirm new password">
+                        </div>
+                        <div class="text-center">
+                            <input type="submit" class="btn btn-luxury-primary w-100" value="Update Password">
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
     }
 
     async function handleProfileUpdate(e) {
@@ -528,6 +554,53 @@
         } catch (err) {
             console.error("Error updating profile:", err);
             alert("Failed to update profile. Please try again.");
+        }
+    }
+
+    async function handlePasswordUpdate(e) {
+        e.preventDefault();
+        const currentPass = document.getElementById("current-pass").value;
+        const newPass = document.getElementById("new-pass").value;
+        const confirmNewPass = document.getElementById("confirm-new-pass").value;
+
+        if (newPass !== confirmNewPass) {
+            alert("New passwords do not match!");
+            return;
+        }
+
+        const strengthCheck = validatePasswordStrength(newPass);
+        if (!strengthCheck.isValid) {
+            alert(strengthCheck.message);
+            return;
+        }
+
+        const hashedCurrent = await hashPassword(currentPass);
+        
+        // Check current password
+        if (user.user_password !== hashedCurrent && user.user_password !== currentPass) {
+            alert("Incorrect current password!");
+            return;
+        }
+
+        const hashedNew = await hashPassword(newPass);
+        const updatedData = {
+            username: user.username,
+            user_email: user.user_email,
+            user_address: user.user_address,
+            user_mobile: user.user_mobile,
+            user_image: user.user_image,
+            role: user.role || 'user',
+            user_password: hashedNew
+        };
+
+        try {
+            await cloudUpdateUser(user.username, updatedData);
+            alert("Password updated successfully! Please login again.");
+            logoutUser();
+            window.location.href = "user_login.html";
+        } catch (err) {
+            console.error("Error updating password:", err);
+            alert("Failed to update password. Please try again.");
         }
     }
 

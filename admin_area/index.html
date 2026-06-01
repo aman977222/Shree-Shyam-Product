@@ -180,6 +180,8 @@
                     <button class="admin-nav-btn" onclick="showAdminSection('users_list')">Users List</button>
                     <button class="admin-nav-btn" onclick="showAdminSection('contact_list')">Contact List</button>
                     <button class="admin-nav-btn" onclick="showAdminSection('manage_admins')">Manage Admins</button>
+                    <button class="admin-nav-btn" onclick="showAdminSection('edit_profile')">Edit Profile</button>
+                    <button class="admin-nav-btn" onclick="showAdminSection('change_password')">Change Password</button>
                     <button class="btn-luxury-outline" onclick="window.location.href='../index.html'">Go To Website</button>
                 </div>
             </div>
@@ -328,6 +330,7 @@
                         <td>${p.product_title}</td>
                         <td><img src="product_images/${p.product_Image1}" style="width:50px; height:50px; object-fit:contain;" alt=""></td>
                         <td>₹ ${p.product_price}/-</td>
+                        <td><button class="btn btn-warning btn-sm text-dark" onclick="showEditProductForm(${p.product_id})"><i class="fa-solid fa-pen-to-square"></i></button></td>
                         <td><button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.product_id})"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `).join('');
@@ -341,10 +344,11 @@
                                 <th>Product Title</th>
                                 <th>Product Image</th>
                                 <th>Product Price</th>
+                                <th>Edit</th>
                                 <th>Delete</th>
                             </tr>
                         </thead>
-                        <tbody>${rows || '<tr><td colspan="5">No products found.</td></tr>'}</tbody>
+                        <tbody>${rows || '<tr><td colspan="6">No products found.</td></tr>'}</tbody>
                     </table>
                 `;
             }
@@ -370,6 +374,7 @@
                     <tr>
                         <td>${idx + 1}</td>
                         <td>${c.categories_title}</td>
+                        <td><button class="btn btn-warning btn-sm text-dark" onclick="showEditCategoryForm(${c.categories_id})"><i class="fa-solid fa-pen-to-square"></i></button></td>
                         <td><button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.categories_id})"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `).join('');
@@ -381,10 +386,11 @@
                             <tr>
                                 <th>Sl no.</th>
                                 <th>Category Title</th>
+                                <th>Edit</th>
                                 <th>Delete</th>
                             </tr>
                         </thead>
-                        <tbody>${rows || '<tr><td colspan="3">No categories found.</td></tr>'}</tbody>
+                        <tbody>${rows || '<tr><td colspan="4">No categories found.</td></tr>'}</tbody>
                     </table>
                 `;
             }
@@ -410,6 +416,7 @@
                     <tr>
                         <td>${idx + 1}</td>
                         <td>${b.Brands_title}</td>
+                        <td><button class="btn btn-warning btn-sm text-dark" onclick="showEditBrandForm(${b.Brands_id})"><i class="fa-solid fa-pen-to-square"></i></button></td>
                         <td><button class="btn btn-danger btn-sm" onclick="deleteBrand(${b.Brands_id})"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `).join('');
@@ -421,10 +428,11 @@
                             <tr>
                                 <th>Sl no.</th>
                                 <th>Brand Title</th>
+                                <th>Edit</th>
                                 <th>Delete</th>
                             </tr>
                         </thead>
-                        <tbody>${rows || '<tr><td colspan="3">No brands found.</td></tr>'}</tbody>
+                        <tbody>${rows || '<tr><td colspan="4">No brands found.</td></tr>'}</tbody>
                     </table>
                 `;
             }
@@ -749,6 +757,77 @@
                     </div>
                 `;
             }
+
+            else if (sectionName === 'edit_profile') {
+                let adminPicSrc = '../image/admin.jpg';
+                if (user.user_image) {
+                    if (user.user_image.startsWith('data:image')) {
+                        adminPicSrc = user.user_image;
+                    } else if (user.user_image === 'admin.png') {
+                        adminPicSrc = '../user_area/user_images/default.png';
+                    } else {
+                        adminPicSrc = `../user_area/user_images/${user.user_image}`;
+                    }
+                }
+                container.innerHTML = `
+                    <div class="form-glass-card w-75 mx-auto mt-3 text-start">
+                        <h3 class="text-center mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">Edit Admin Profile</h3>
+                        <form id="admin-edit-form" onsubmit="handleAdminProfileUpdate(event)">
+                            <div class="form-outline mb-3">
+                                <label class="form-label-luxury">Username</label>
+                                <input type="text" id="admin-edit-username" class="form-control form-control-luxury w-100" value="${user.username}" required placeholder="Username">
+                            </div>
+                            <div class="form-outline mb-3">
+                                <label class="form-label-luxury">Email Address</label>
+                                <input type="email" id="admin-edit-email" class="form-control form-control-luxury w-100" value="${user.user_email}" required placeholder="Email">
+                            </div>
+                            <div class="form-outline mb-3">
+                                <label class="form-label-luxury">Profile Image</label>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <input type="file" id="admin-edit-image" class="form-control form-control-luxury w-75 m-0" onchange="previewAdminEditImage(this)">
+                                    <img id="admin-edit-preview-pic" src="${adminPicSrc}" alt="" class="profile_img ms-2" onerror="handleAdminPicError(this)">
+                                </div>
+                            </div>
+                            <div class="form-outline mb-3">
+                                <label class="form-label-luxury">Address</label>
+                                <input type="text" id="admin-edit-address" class="form-control form-control-luxury w-100" value="${user.user_address || ''}" placeholder="Address">
+                            </div>
+                            <div class="form-outline mb-4">
+                                <label class="form-label-luxury">Mobile</label>
+                                <input type="text" id="admin-edit-mobile" class="form-control form-control-luxury w-100" value="${user.user_mobile || ''}" placeholder="Mobile">
+                            </div>
+                            <div class="text-center">
+                                <input type="submit" class="btn btn-luxury-primary w-100 text-light" value="Update Profile">
+                            </div>
+                        </form>
+                    </div>
+                `;
+            }
+
+            else if (sectionName === 'change_password') {
+                container.innerHTML = `
+                    <div class="form-glass-card w-50 mx-auto mt-3 text-start">
+                        <h3 class="text-center mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">Change Admin Password</h3>
+                        <form id="admin-change-password-form" onsubmit="handleAdminPasswordUpdate(event)">
+                            <div class="form-outline mb-3">
+                                <label class="form-label-luxury">Current Password</label>
+                                <input type="password" id="admin-current-pass" class="form-control form-control-luxury w-100" required placeholder="Enter current password">
+                            </div>
+                            <div class="form-outline mb-3">
+                                <label class="form-label-luxury">New Password</label>
+                                <input type="password" id="admin-new-pass" class="form-control form-control-luxury w-100" required placeholder="Enter new password">
+                            </div>
+                            <div class="form-outline mb-4">
+                                <label class="form-label-luxury">Confirm New Password</label>
+                                <input type="password" id="admin-confirm-new-pass" class="form-control form-control-luxury w-100" required placeholder="Confirm new password">
+                            </div>
+                            <div class="text-center">
+                                <input type="submit" class="btn btn-luxury-primary w-100 text-light" value="Update Password">
+                            </div>
+                        </form>
+                    </div>
+                `;
+            }
         }
 
         // SPA form handlers
@@ -837,10 +916,194 @@
             }
         }
 
+        // SPA Editing Operations
+        function showEditProductForm(id) {
+            const products = getProducts();
+            const p = products.find(prod => prod.product_id === id);
+            if (!p) return;
+
+            const cats = getCategories();
+            const brs = getBrands();
+            const container = document.getElementById("admin-content-container");
+
+            container.innerHTML = `
+                <h2 class="text-center text-light mb-4">Edit Product</h2>
+                <form id="edit-product-form" onsubmit="handleEditProductSubmit(event, ${id})" class="w-75 m-auto form-glass-card">
+                    <div class="form-outline mb-3">
+                        <label class="form-label-luxury">Product Title</label>
+                        <input type="text" id="edit-p-title" class="form-control form-control-luxury" value="${p.product_title}" required>
+                    </div>
+                    <div class="form-outline mb-3">
+                        <label class="form-label-luxury">Description</label>
+                        <input type="text" id="edit-p-desc" class="form-control form-control-luxury" value="${p.product_description}" required>
+                    </div>
+                    <div class="form-outline mb-3">
+                        <label class="form-label-luxury">Product Keywords</label>
+                        <input type="text" id="edit-p-keywords" class="form-control form-control-luxury" value="${p.product_keywords}" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-outline mb-3">
+                            <label class="form-label-luxury">Category</label>
+                            <select id="edit-p-category" class="form-select form-control-luxury" required>
+                                ${cats.map(c => `<option value="${c.categories_id}" style="background: #12141a; color: #fff;" ${c.categories_id === p.category_id ? 'selected' : ''}>${c.categories_title}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-outline mb-3">
+                            <label class="form-label-luxury">Brand</label>
+                            <select id="edit-p-brand" class="form-select form-control-luxury" required>
+                                ${brs.map(b => `<option value="${b.Brands_id}" style="background: #12141a; color: #fff;" ${b.Brands_id === p.brand_id ? 'selected' : ''}>${b.Brands_title}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-outline mb-3">
+                        <label class="form-label-luxury">Product Image 1 (Current: ${p.product_Image1})</label>
+                        <input type="file" id="edit-p-img1" class="form-control form-control-luxury">
+                    </div>
+                    <div class="form-outline mb-3">
+                        <label class="form-label-luxury">Product Image 2 (Current: ${p.product_Image2})</label>
+                        <input type="file" id="edit-p-img2" class="form-control form-control-luxury">
+                    </div>
+                    <div class="form-outline mb-3">
+                        <label class="form-label-luxury">Product Image 3 (Current: ${p.product_Image3})</label>
+                        <input type="file" id="edit-p-img3" class="form-control form-control-luxury">
+                    </div>
+                    <div class="form-outline mb-4">
+                        <label class="form-label-luxury">Product Price (₹)</label>
+                        <input type="number" id="edit-p-price" class="form-control form-control-luxury" value="${p.product_price}" required>
+                    </div>
+                    <div class="text-center d-flex justify-content-center gap-3">
+                        <input type="submit" class="btn-luxury-primary px-4 py-2 text-light" value="Update Product">
+                        <button type="button" class="btn-luxury-outline px-4 py-2" onclick="showAdminSection('view_products')">Cancel</button>
+                    </div>
+                </form>
+            `;
+        }
+
+        async function handleEditProductSubmit(e, id) {
+            e.preventDefault();
+            const products = getProducts();
+            const p = products.find(prod => prod.product_id === id);
+            if (!p) return;
+
+            const title = document.getElementById("edit-p-title").value;
+            const desc = document.getElementById("edit-p-desc").value;
+            const keywords = document.getElementById("edit-p-keywords").value;
+            const category = document.getElementById("edit-p-category").value;
+            const brand = document.getElementById("edit-p-brand").value;
+            const price = document.getElementById("edit-p-price").value;
+
+            const img1File = document.getElementById("edit-p-img1").files[0];
+            const img2File = document.getElementById("edit-p-img2").files[0];
+            const img3File = document.getElementById("edit-p-img3").files[0];
+
+            const updatedProduct = {
+                product_id: id,
+                product_title: title,
+                product_description: desc,
+                product_keywords: keywords,
+                category_id: parseInt(category),
+                brand_id: parseInt(brand),
+                product_Image1: img1File ? img1File.name : p.product_Image1,
+                product_Image2: img2File ? img2File.name : p.product_Image2,
+                product_Image3: img3File ? img3File.name : p.product_Image3,
+                product_price: parseInt(price)
+            };
+
+            try {
+                await cloudUpdateProduct(updatedProduct);
+                await dbInit(); // Refresh memory cache
+                alert("Product updated successfully");
+                showAdminSection('view_products');
+            } catch (err) {
+                console.error("Error updating product:", err);
+                alert("Failed to update product.");
+            }
+        }
+
+        function showEditCategoryForm(id) {
+            const cats = getCategories();
+            const c = cats.find(cat => cat.categories_id === id);
+            if (!c) return;
+
+            const container = document.getElementById("admin-content-container");
+            container.innerHTML = `
+                <h2 class="text-center text-light mb-4">Edit Category</h2>
+                <form onsubmit="handleEditCategorySubmit(event, ${id})" class="w-50 m-auto form-glass-card">
+                    <div class="form-outline mb-4">
+                        <label class="form-label-luxury">Category Title</label>
+                        <input type="text" id="edit-cat-title" class="form-control form-control-luxury" value="${c.categories_title}" required>
+                    </div>
+                    <div class="text-center d-flex justify-content-center gap-3">
+                        <input type="submit" class="btn-luxury-primary px-4 py-2" value="Update Category">
+                        <button type="button" class="btn-luxury-outline px-4 py-2" onclick="showAdminSection('view_categories')">Cancel</button>
+                    </div>
+                </form>
+            `;
+        }
+
+        async function handleEditCategorySubmit(e, id) {
+            e.preventDefault();
+            const title = document.getElementById("edit-cat-title").value;
+            const updatedCategory = {
+                categories_id: id,
+                categories_title: title
+            };
+
+            try {
+                await cloudUpdateCategory(updatedCategory);
+                await dbInit(); // Refresh memory cache
+                alert("Category updated successfully");
+                showAdminSection('view_categories');
+            } catch (err) {
+                console.error("Error updating category:", err);
+                alert("Failed to update category.");
+            }
+        }
+
+        function showEditBrandForm(id) {
+            const brs = getBrands();
+            const b = brs.find(brand => brand.Brands_id === id);
+            if (!b) return;
+
+            const container = document.getElementById("admin-content-container");
+            container.innerHTML = `
+                <h2 class="text-center text-light mb-4">Edit Brand</h2>
+                <form onsubmit="handleEditBrandSubmit(event, ${id})" class="w-50 m-auto form-glass-card">
+                    <div class="form-outline mb-4">
+                        <label class="form-label-luxury">Brand Title</label>
+                        <input type="text" id="edit-brand-title" class="form-control form-control-luxury" value="${b.Brands_title}" required>
+                    </div>
+                    <div class="text-center d-flex justify-content-center gap-3">
+                        <input type="submit" class="btn-luxury-primary px-4 py-2" value="Update Brand">
+                        <button type="button" class="btn-luxury-outline px-4 py-2" onclick="showAdminSection('view_brands')">Cancel</button>
+                    </div>
+                </form>
+            `;
+        }
+
+        async function handleEditBrandSubmit(e, id) {
+            e.preventDefault();
+            const title = document.getElementById("edit-brand-title").value;
+            const updatedBrand = {
+                Brands_id: id,
+                Brands_title: title
+            };
+
+            try {
+                await cloudUpdateBrand(updatedBrand);
+                await dbInit(); // Refresh memory cache
+                alert("Brand updated successfully");
+                showAdminSection('view_brands');
+            } catch (err) {
+                console.error("Error updating brand:", err);
+                alert("Failed to update brand.");
+            }
+        }
+
         // SPA Deletion operations
         async function deleteProduct(id) {
-            if (user.role !== 'superadmin') {
-                alert("Only Superadmin can delete products!");
+            if (user.role !== 'superadmin' && user.role !== 'admin') {
+                alert("Only Admin/Superadmin can delete products!");
                 return;
             }
             if (confirm("Are you sure you want to delete this product?")) {
@@ -856,8 +1119,8 @@
         }
 
         async function deleteCategory(id) {
-            if (user.role !== 'superadmin') {
-                alert("Only Superadmin can delete categories!");
+            if (user.role !== 'superadmin' && user.role !== 'admin') {
+                alert("Only Admin/Superadmin can delete categories!");
                 return;
             }
             if (confirm("Are you sure you want to delete this category?")) {
@@ -873,8 +1136,8 @@
         }
 
         async function deleteBrand(id) {
-            if (user.role !== 'superadmin') {
-                alert("Only Superadmin can delete brands!");
+            if (user.role !== 'superadmin' && user.role !== 'admin') {
+                alert("Only Admin/Superadmin can delete brands!");
                 return;
             }
             if (confirm("Are you sure you want to delete this brand?")) {
@@ -1023,6 +1286,116 @@
                     console.error("Error deleting admin account:", err);
                     alert("Failed to delete admin account.");
                 }
+            }
+        }
+
+        function previewAdminEditImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('admin-edit-preview-pic').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function handleAdminProfileUpdate(e) {
+            e.preventDefault();
+            const usernameVal = document.getElementById("admin-edit-username").value.trim();
+            const emailVal = document.getElementById("admin-edit-email").value.trim();
+            const addressVal = document.getElementById("admin-edit-address").value.trim();
+            const mobileVal = document.getElementById("admin-edit-mobile").value.trim();
+
+            const fileInput = document.getElementById("admin-edit-image");
+            let newImage = user.user_image || 'admin.png';
+            if (fileInput.files[0]) {
+                try {
+                    newImage = await compressAndResizeImage(fileInput.files[0], 150, 150);
+                } catch (err) {
+                    console.error("Error compressing image:", err);
+                    newImage = fileInput.files[0].name;
+                }
+            }
+
+            const updatedData = {
+                username: usernameVal,
+                user_email: emailVal,
+                user_address: addressVal,
+                user_mobile: mobileVal,
+                user_image: newImage,
+                role: user.role || 'admin',
+                user_password: user.user_password
+            };
+
+            try {
+                if (usernameVal !== user.username) {
+                    // Check if new username is already taken
+                    const userDoc = await db.collection("users").doc(usernameVal).get();
+                    if (userDoc.exists) {
+                        alert("Username already taken!");
+                        return;
+                    }
+                    
+                    // Write new document under new doc ID and delete old doc ID
+                    await db.collection("users").doc(usernameVal).set(updatedData);
+                    await db.collection("users").doc(user.username).delete();
+
+                    // Update username in all their orders if any
+                    const ordersSnapshot = await db.collection("orders").where("username", "==", user.username).get();
+                    for (const doc of ordersSnapshot.docs) {
+                        await doc.ref.update({ username: usernameVal });
+                    }
+                } else {
+                    await cloudUpdateUser(user.username, updatedData);
+                }
+
+                alert("Profile updated successfully! Please login again.");
+                logoutUser();
+                window.location.href = "../index.html";
+            } catch (err) {
+                console.error("Error updating profile:", err);
+                alert("Failed to update profile. Please try again.");
+            }
+        }
+
+        async function handleAdminPasswordUpdate(e) {
+            e.preventDefault();
+            const currentPass = document.getElementById("admin-current-pass").value;
+            const newPass = document.getElementById("admin-new-pass").value;
+            const confirmNewPass = document.getElementById("admin-confirm-new-pass").value;
+
+            if (newPass !== confirmNewPass) {
+                alert("New passwords do not match!");
+                return;
+            }
+
+            const hashedCurrent = await hashPassword(currentPass);
+            
+            // Check current password
+            if (user.user_password !== hashedCurrent && user.user_password !== currentPass) {
+                alert("Incorrect current password!");
+                return;
+            }
+
+            const hashedNew = await hashPassword(newPass);
+            const updatedData = {
+                username: user.username,
+                user_email: user.user_email,
+                user_address: user.user_address || '',
+                user_mobile: user.user_mobile || '',
+                user_image: user.user_image || 'admin.png',
+                role: user.role || 'admin',
+                user_password: hashedNew
+            };
+
+            try {
+                await cloudUpdateUser(user.username, updatedData);
+                alert("Password updated successfully! Please login again.");
+                logoutUser();
+                window.location.href = "../index.html";
+            } catch (err) {
+                console.error("Error updating password:", err);
+                alert("Failed to update password. Please try again.");
             }
         }
 
