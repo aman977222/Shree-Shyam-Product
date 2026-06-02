@@ -333,23 +333,95 @@
         chatBody.scrollTop = chatBody.scrollHeight;
 
         setTimeout(() => {
-            let reply = "I'm not sure about that. Try asking about our cars, bikes, or prices!";
             const lower = text.toLowerCase();
-            if (lower.includes("hello") || lower.includes("hi")) {
-                reply = "Hello there! Welcome to Shree Shyam Products. How can I assist you today?";
-            } else if (lower.includes("car")) {
-                reply = "We have high-end sports and luxury cars from BMW, Jaguar, and Lamborghini!";
-            } else if (lower.includes("bike") || lower.includes("motorcycle")) {
-                reply = "Check out our sports and adventure bikes from KTM and Yamaha!";
-            } else if (lower.includes("price") || lower.includes("cost")) {
-                reply = "Our prices range from 1,80,000/- for Yamaha R15 up to 4,50,00,000/- for the Lamborghini Temerario!";
-            } else if (lower.includes("cart") || lower.includes("buy")) {
-                reply = "You can add any product to your cart by clicking the 'ADD to cart' button, and then click on the cart icon at the top to checkout.";
+
+            // Helper: respond with product details when user asks for a specific product
+            // Support both numeric id (e.g. "product 3") and name-based queries (e.g. "product pashmina" / "tell me about pashmina shawl")
+            const productIdMatch = text.match(/\bproduct\s*(?:id|#|-)?:?\s*(\d+)\b/i) || text.match(/\b(\d+)\b/);
+            if (lower.includes("product") && productIdMatch) {
+                const id = parseInt(productIdMatch[1]);
+                const prod = getProducts().find(p => p.product_id === id);
+                if (prod) {
+                    const images = prod.product_Images && prod.product_Images.length ? prod.product_Images.join(', ') : [prod.product_Image1, prod.product_Image2, prod.product_Image3].filter(Boolean).join(', ');
+                    const reply = `Product #${prod.product_id}: ${prod.product_title} - ${prod.product_description} Price: ${prod.product_price}/-. Images: ${images}`;
+                    chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2"><strong>AI Bot:</strong> ${reply}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    return;
+                } else {
+                    const reply = `I couldn't find a product with id ${id}. Please check the id and try again.`;
+                    chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2"><strong>AI Bot:</strong> ${reply}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    return;
+                }
             }
+
+            // Name-based product search: support plain name queries and phrases like 'tell me about pashmina'
+            const nameQueryMatch = text.match(/(?:product|about|tell me about|show me)\s*[:\-]?\s*(.+)/i);
+            let nameQuery = nameQueryMatch ? nameQueryMatch[1].trim() : text.trim();
+            nameQuery = nameQuery.replace(/\bproduct\b/i, '').trim();
+
+            // Avoid running name search for short/generic conversational words
+            if (nameQuery.length > 2 && !/(^hi$|^hello$|price|cost|order|orders|cart|buy)/i.test(nameQuery)) {
+                const products = getProducts();
+                const q = nameQuery.toLowerCase();
+                const matches = products.filter(p => {
+                    const title = (p.product_title || '').toLowerCase();
+                    const keywords = (p.product_keywords || '').toLowerCase();
+                    return title.includes(q) || keywords.includes(q) || title.split(' ').some(w => w.startsWith(q));
+                });
+
+                if (matches.length === 1) {
+                    const prod = matches[0];
+                    const images = prod.product_Images && prod.product_Images.length ? prod.product_Images.join(', ') : [prod.product_Image1, prod.product_Image2, prod.product_Image3].filter(Boolean).join(', ');
+                    const reply = `Product: ${prod.product_title} - ${prod.product_description} Price: ${prod.product_price}/-. Images: ${images} <br><a href="product_details.html?product_id=${prod.product_id}">View product</a>`;
+                    chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2" style="white-space:normal;"><strong>AI Bot:</strong> ${reply}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    return;
+                } else if (matches.length > 1) {
+                    const list = matches.slice(0,5).map(m => `<a href="product_details.html?product_id=${m.product_id}">${m.product_title}</a> (id:${m.product_id}) - ₹${m.product_price}`).join('<br>');
+                    const reply = `I found multiple products matching "${nameQuery}":<br>${list}<br>Ask for a specific product name or id.`;
+                    chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2" style="white-space:normal;">${reply}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    return;
+                }
+                // else no matches -> continue to fallbacks
+            }
+
+            // Helper: return order details for logged-in user
+            if (lower.includes("order") || lower.includes("orders") || lower.includes("my order") || lower.includes("order details")) {
+                const user = getLoggedInUser();
+                if (!user) {
+                    const reply = "Please login to see your order details.";
+                    chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2"><strong>AI Bot:</strong> ${reply}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    return;
+                }
+
+                const userOrders = getOrders().filter(o => (o.username && o.username === user.username) || (o.user_email && o.user_email === user.user_email) || (o.user && o.user === user.username));
+                if (userOrders.length === 0) {
+                    const reply = "You have no orders yet.";
+                    chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2"><strong>AI Bot:</strong> ${reply}</div>`;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    return;
+                }
+
+                // Format up to 5 recent orders
+                const replyLines = userOrders.slice(-5).map(o => `Order #${o.order_id} (${o.order_date}) - Status: ${o.order_status} - Total: ${o.total || 'N/A'} - Invoice: ${o.invoice_number || 'N/A'}`);
+                const reply = `Your recent orders:\n` + replyLines.join('\n');
+                chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2" style="white-space:pre-wrap;"><strong>AI Bot:</strong> ${reply}</div>`;
+                chatBody.scrollTop = chatBody.scrollHeight;
+                return;
+            }
+
+            // Fallback conversational responses
+            let reply = "I'm not sure about that. Try asking about a product by id (e.g. 'product 3') or ask 'order details' to see your orders.";
+            if (lower.includes("hello") || lower.includes("hi")) reply = "Hello there! Welcome to Shree Shyam Products. How can I assist you today?";
+            else if (lower.includes("price") || lower.includes("cost")) reply = "You can ask for a specific product id to get its price and details.";
+            else if (lower.includes("cart") || lower.includes("buy")) reply = "Add any product to your cart with the 'ADD to cart' button, then checkout from the cart.";
 
             chatBody.innerHTML += `<div class="bot-msg text-secondary mt-2"><strong>AI Bot:</strong> ${reply}</div>`;
             chatBody.scrollTop = chatBody.scrollHeight;
-        }, 800);
+        }, 300);
     }
 
     // Invoke page load initialization
