@@ -300,16 +300,8 @@
                             </div>
                         </div>
                         <div class="form-outline mb-3">
-                            <label class="form-label-luxury">Product Image 1</label>
-                            <input type="file" id="p-img1" class="form-control form-control-luxury" required>
-                        </div>
-                        <div class="form-outline mb-3">
-                            <label class="form-label-luxury">Product Image 2</label>
-                            <input type="file" id="p-img2" class="form-control form-control-luxury" required>
-                        </div>
-                        <div class="form-outline mb-3">
-                            <label class="form-label-luxury">Product Image 3</label>
-                            <input type="file" id="p-img3" class="form-control form-control-luxury" required>
+                            <label class="form-label-luxury">Product Images (You can select multiple images)</label>
+                            <input type="file" id="p-images" class="form-control form-control-luxury" multiple required>
                         </div>
                         <div class="form-outline mb-4">
                             <label class="form-label-luxury">Product Price (₹)</label>
@@ -840,10 +832,9 @@
             const brand = document.getElementById("p-brand").value;
             const price = document.getElementById("p-price").value;
 
-            // Fake image filenames
-            const img1File = document.getElementById("p-img1").files[0];
-            const img2File = document.getElementById("p-img2").files[0];
-            const img3File = document.getElementById("p-img3").files[0];
+            // Multiple images handling
+            const files = document.getElementById("p-images").files;
+            const fileList = Array.from(files);
 
             const products = getProducts();
             const newId = products.length > 0 ? Math.max(...products.map(p => p.product_id)) + 1 : 1;
@@ -855,9 +846,10 @@
                 product_keywords: keywords,
                 category_id: parseInt(category),
                 brand_id: parseInt(brand),
-                product_Image1: img1File ? img1File.name : "default_car.png",
-                product_Image2: img2File ? img2File.name : "default_car.png",
-                product_Image3: img3File ? img3File.name : "default_car.png",
+                product_Image1: fileList[0] ? fileList[0].name : "default_car.png",
+                product_Image2: fileList[1] ? fileList[1].name : (fileList[0] ? fileList[0].name : "default_car.png"),
+                product_Image3: fileList[2] ? fileList[2].name : (fileList[0] ? fileList[0].name : "default_car.png"),
+                product_Images: fileList.map(f => f.name),
                 product_price: parseInt(price)
             };
 
@@ -956,16 +948,9 @@
                         </div>
                     </div>
                     <div class="form-outline mb-3">
-                        <label class="form-label-luxury">Product Image 1 (Current: ${p.product_Image1})</label>
-                        <input type="file" id="edit-p-img1" class="form-control form-control-luxury">
-                    </div>
-                    <div class="form-outline mb-3">
-                        <label class="form-label-luxury">Product Image 2 (Current: ${p.product_Image2})</label>
-                        <input type="file" id="edit-p-img2" class="form-control form-control-luxury">
-                    </div>
-                    <div class="form-outline mb-3">
-                        <label class="form-label-luxury">Product Image 3 (Current: ${p.product_Image3})</label>
-                        <input type="file" id="edit-p-img3" class="form-control form-control-luxury">
+                        <label class="form-label-luxury">Product Images (Select multiple to replace current images)</label>
+                        <input type="file" id="edit-p-images" class="form-control form-control-luxury" multiple>
+                        <small class="text-muted d-block mt-1">Current images: ${p.product_Images && Array.isArray(p.product_Images) ? p.product_Images.join(', ') : [p.product_Image1, p.product_Image2, p.product_Image3].filter(Boolean).join(', ')}</small>
                     </div>
                     <div class="form-outline mb-4">
                         <label class="form-label-luxury">Product Price (₹)</label>
@@ -992,9 +977,7 @@
             const brand = document.getElementById("edit-p-brand").value;
             const price = document.getElementById("edit-p-price").value;
 
-            const img1File = document.getElementById("edit-p-img1").files[0];
-            const img2File = document.getElementById("edit-p-img2").files[0];
-            const img3File = document.getElementById("edit-p-img3").files[0];
+            const files = document.getElementById("edit-p-images").files;
 
             const updatedProduct = {
                 product_id: id,
@@ -1003,11 +986,21 @@
                 product_keywords: keywords,
                 category_id: parseInt(category),
                 brand_id: parseInt(brand),
-                product_Image1: img1File ? img1File.name : p.product_Image1,
-                product_Image2: img2File ? img2File.name : p.product_Image2,
-                product_Image3: img3File ? img3File.name : p.product_Image3,
                 product_price: parseInt(price)
             };
+
+            if (files.length > 0) {
+                const fileList = Array.from(files);
+                updatedProduct.product_Images = fileList.map(f => f.name);
+                updatedProduct.product_Image1 = fileList[0] ? fileList[0].name : "default_car.png";
+                updatedProduct.product_Image2 = fileList[1] ? fileList[1].name : (fileList[0] ? fileList[0].name : "default_car.png");
+                updatedProduct.product_Image3 = fileList[2] ? fileList[2].name : (fileList[0] ? fileList[0].name : "default_car.png");
+            } else {
+                updatedProduct.product_Images = p.product_Images || [p.product_Image1, p.product_Image2, p.product_Image3].filter(Boolean);
+                updatedProduct.product_Image1 = p.product_Image1;
+                updatedProduct.product_Image2 = p.product_Image2;
+                updatedProduct.product_Image3 = p.product_Image3;
+            }
 
             try {
                 await cloudUpdateProduct(updatedProduct);

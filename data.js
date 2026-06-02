@@ -645,16 +645,9 @@ async function handleEditProductHome(id) {
             </div>
         </div>
         <div class="form-outline mb-3">
-            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Image 1 (Current: ${p.product_Image1})</label>
-            <input type="file" id="edit-modal-img1" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;">
-        </div>
-        <div class="form-outline mb-3">
-            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Image 2 (Current: ${p.product_Image2})</label>
-            <input type="file" id="edit-modal-img2" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;">
-        </div>
-        <div class="form-outline mb-3">
-            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Image 3 (Current: ${p.product_Image3})</label>
-            <input type="file" id="edit-modal-img3" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;">
+            <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Images (Select multiple to replace current images)</label>
+            <input type="file" id="edit-modal-images" class="form-control form-control-luxury" style="background: rgba(8, 9, 12, 0.5); border: 1px solid rgba(212, 175, 55, 0.25); color: #fff;" multiple>
+            <small class="text-muted d-block mt-1">Current images: ${p.product_Images && Array.isArray(p.product_Images) ? p.product_Images.join(', ') : [p.product_Image1, p.product_Image2, p.product_Image3].filter(Boolean).join(', ')}</small>
         </div>
         <div class="form-outline mb-4">
             <label class="form-label-luxury" style="color: var(--accent-gold); font-weight:600;">Product Price (₹)</label>
@@ -670,9 +663,7 @@ async function handleEditProductHome(id) {
         const brand = form.querySelector("#edit-modal-brand").value;
         const price = form.querySelector("#edit-modal-price").value;
 
-        const img1File = form.querySelector("#edit-modal-img1").files[0];
-        const img2File = form.querySelector("#edit-modal-img2").files[0];
-        const img3File = form.querySelector("#edit-modal-img3").files[0];
+        const files = form.querySelector("#edit-modal-images").files;
 
         const updatedProduct = {
             product_id: id,
@@ -681,11 +672,21 @@ async function handleEditProductHome(id) {
             product_keywords: keywords,
             category_id: parseInt(category),
             brand_id: parseInt(brand),
-            product_Image1: img1File ? img1File.name : p.product_Image1,
-            product_Image2: img2File ? img2File.name : p.product_Image2,
-            product_Image3: img3File ? img3File.name : p.product_Image3,
             product_price: parseInt(price)
         };
+
+        if (files.length > 0) {
+            const fileList = Array.from(files);
+            updatedProduct.product_Images = fileList.map(f => f.name);
+            updatedProduct.product_Image1 = fileList[0] ? fileList[0].name : "default_car.png";
+            updatedProduct.product_Image2 = fileList[1] ? fileList[1].name : (fileList[0] ? fileList[0].name : "default_car.png");
+            updatedProduct.product_Image3 = fileList[2] ? fileList[2].name : (fileList[0] ? fileList[0].name : "default_car.png");
+        } else {
+            updatedProduct.product_Images = p.product_Images || [p.product_Image1, p.product_Image2, p.product_Image3].filter(Boolean);
+            updatedProduct.product_Image1 = p.product_Image1;
+            updatedProduct.product_Image2 = p.product_Image2;
+            updatedProduct.product_Image3 = p.product_Image3;
+        }
 
         try {
             await cloudUpdateProduct(updatedProduct);
