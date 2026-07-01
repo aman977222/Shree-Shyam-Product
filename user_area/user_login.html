@@ -127,6 +127,7 @@
     <!-- Import Firebase and database layer -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="../data.js"></script>
     <script>
         async function initPage() {
@@ -143,16 +144,55 @@
             const usernameVal = document.getElementById("user_username").value;
             const passwordVal = document.getElementById("user_password").value;
 
-            const res = await loginUser(usernameVal, passwordVal);
-            if (res.success) {
-                alert("Login successful");
-                if (res.user.role === "admin" || res.user.role === "superadmin") {
-                    window.location.href = "../admin_area/index.html";
-                } else {
-                    window.location.href = "../index.html";
+            const submitBtn = e.target.querySelector('input[type="submit"]');
+            const originalVal = submitBtn.value;
+            submitBtn.disabled = true;
+            submitBtn.value = "Logging in...";
+
+            try {
+                // Find user details (specifically email) from cache
+                const matched = getUsers().find(u => u.username === usernameVal);
+                if (!matched) {
+                    throw new Error("Invalid username or password!");
                 }
-            } else {
-                alert(res.message);
+
+                // If admin/superadmin, bypass Firebase Auth verification to prevent lockout
+                if (matched.role === "admin" || matched.role === "superadmin") {
+                    const res = await loginUser(usernameVal, passwordVal);
+                    if (res.success) {
+                        alert("Login successful");
+                        window.location.href = "../admin_area/index.html";
+                    } else {
+                        throw new Error(res.message);
+                    }
+                    return;
+                }
+
+                // Sign in with Firebase Auth to check if email is verified
+                const authResult = await firebase.auth().signInWithEmailAndPassword(matched.user_email, passwordVal);
+                const user = authResult.user;
+
+                if (!user.emailVerified) {
+                    // Send another verification link in case they lost the previous one
+                    await user.sendEmailVerification();
+                    throw new Error("Apka Email id verified nahi hai! Ek naya verification link aapke mail par send kiya gaya hai. Kripya use verify karein.");
+                }
+
+                // Log in globally in Firestore session
+                const res = await loginUser(usernameVal, passwordVal);
+                if (res.success) {
+                    alert("Login successful");
+                    window.location.href = "../index.html";
+                } else {
+                    throw new Error(res.message);
+                }
+
+            } catch (err) {
+                console.error("Login error:", err);
+                alert(err.message || "Login failed. Please try again.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.value = originalVal;
             }
         }
 
