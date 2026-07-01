@@ -83,6 +83,11 @@
           const subject = document.getElementById("subject").value;
           const msg = document.getElementById("messages").value;
 
+          const submitBtn = e.target.querySelector('input[type="submit"]');
+          const originalValue = submitBtn.value;
+          submitBtn.disabled = true;
+          submitBtn.value = "Sending...";
+
           const msgData = {
               username: username,
               email: email,
@@ -91,12 +96,42 @@
               messages: msg
           };
 
+          const web3Payload = {
+              access_key: "234994cb-830b-4aa5-bf26-a5193696def4",
+              from_name: "Shree Shyam Products",
+              subject: `Shree Shyam Products - ${subject}`,
+              name: username,
+              email: email,
+              phone: mobile,
+              message: msg
+          };
+
           try {
+              // 1. Submit email via Web3Forms
+              const web3Response = await fetch("https://api.web3forms.com/submit", {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                      "Accept": "application/json"
+                  },
+                  body: JSON.stringify(web3Payload)
+              });
+              
+              const web3Result = await web3Response.json();
+              if (web3Response.status !== 200) {
+                  throw new Error(web3Result.message || "Failed to send email via Web3Forms");
+              }
+
+              // 2. Save message to Firestore database
               await addMessage(msgData);
+              
               showSuccessAlert("Thank You!", "Your message has been sent successfully. We'll get back to you shortly.", "index.html");
           } catch (err) {
               console.error("Error sending message:", err);
-              alert("Failed to send message. Please try again.");
+              alert(err.message || "Failed to send message. Please try again.");
+          } finally {
+              submitBtn.disabled = false;
+              submitBtn.value = originalValue;
           }
       }
 
