@@ -6,11 +6,34 @@
     <title>user login - Shree Shyam Product</title>
     <!--bootstrap css link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--font awesome-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!--css file link-->
     <link rel="stylesheet" href="../style.css">
      <style>
       body{
       overflow-x:hidden;
+      }
+      .password-wrapper {
+          position: relative;
+      }
+      .password-wrapper .form-control-luxury {
+          padding-right: 45px !important;
+      }
+      .password-toggle-btn {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          color: #d4af37;
+          cursor: pointer;
+          z-index: 10;
+          padding: 0;
+      }
+      .password-toggle-btn:focus {
+          outline: none;
       }
       section {
           min-height: 100vh;
@@ -107,7 +130,15 @@
                             <!-- password field-->
                             <div class="form-outline mb-4">
                                 <label for="user_password" class="form-label-luxury">Password</label>
-                                <input type="password" id="user_password" class="form-control form-control-luxury" placeholder="Enter your password" autocomplete="off" required name="user_password">
+                                <div class="password-wrapper">
+                                    <input type="password" id="user_password" class="form-control form-control-luxury" placeholder="Enter your password" autocomplete="off" required name="user_password">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('user_password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="text-end mt-2">
+                                    <a href="#" onclick="forgotPassword(event)" class="text-warning text-decoration-none fw-bold" style="font-size: 0.85rem;">Forgot Password? / Reset Password</a>
+                                </div>
                             </div>
                             <!-- submit button -->
                             <div class="mt-4 pt-2 d-flex align-items-center justify-content-between flex-wrap gap-3">
@@ -179,7 +210,21 @@
                 }
 
                 // Log in globally in Firestore session
-                const res = await loginUser(usernameVal, passwordVal);
+                let res = await loginUser(usernameVal, passwordVal);
+                if (!res.success) {
+                    // Mismatch! But since Firebase Auth succeeded, it means the user has reset/changed their password in Auth.
+                    // Let's update Firestore to match!
+                    const hashedNew = await hashPassword(passwordVal);
+                    await db.collection("users").doc(usernameVal).update({ user_password: hashedNew });
+                    
+                    // Clear and reload cache
+                    clearDatabaseCache();
+                    await dbInit();
+                    
+                    // Try to log in again
+                    res = await loginUser(usernameVal, passwordVal);
+                }
+
                 if (res.success) {
                     alert("Login successful");
                     window.location.href = "../index.html";
@@ -193,6 +238,56 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.value = originalVal;
+            }
+        }
+
+        async function forgotPassword(e) {
+            if (e) e.preventDefault();
+            
+            const email = prompt("Enter your registered email address to receive a password reset link:");
+            if (!email) return; // User cancelled or left empty
+            
+            try {
+                // Check if the email exists in our Firestore database first
+                const userSnapshot = await db.collection('users').where('user_email', '==', email.trim()).get();
+                if (userSnapshot.empty) {
+                    alert("Yeh email address registered nahi hai!");
+                    return;
+                }
+
+                await firebase.auth().sendPasswordResetEmail(email.trim());
+                alert("Password reset link has been sent to your email! Please check your inbox/spam folder. 🎉");
+            } catch (err) {
+                console.error(err);
+                if (err.code === 'auth/user-not-found') {
+                    try {
+                        // User exists in Firestore but not in Firebase Auth
+                        const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
+                        await firebase.auth().createUserWithEmailAndPassword(email.trim(), tempPassword);
+                        await firebase.auth().sendPasswordResetEmail(email.trim());
+                        alert("Password reset link has been sent to your email! Please check your inbox/spam folder. 🎉");
+                        return;
+                    } catch (createErr) {
+                        console.error(createErr);
+                        alert(createErr.message || "Failed to send password reset email.");
+                        return;
+                    }
+                }
+                alert(err.message || "Failed to send password reset email.");
+            }
+        }
+
+        function togglePasswordVisibility(inputId, btnEl) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            const icon = btnEl.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
             }
         }
 

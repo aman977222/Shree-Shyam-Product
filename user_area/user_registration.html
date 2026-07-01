@@ -12,6 +12,27 @@
     <link rel="stylesheet" href="../style.css">
     <style>
       body { overflow-x: hidden; }
+      .password-wrapper {
+          position: relative;
+      }
+      .password-wrapper .form-control-luxury {
+          padding-right: 45px !important;
+      }
+      .password-toggle-btn {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          color: #d4af37;
+          cursor: pointer;
+          z-index: 10;
+          padding: 0;
+      }
+      .password-toggle-btn:focus {
+          outline: none;
+      }
       section {
           min-height: 100vh;
           background: linear-gradient(135deg, rgba(8, 9, 12, 0.96), rgba(18, 19, 26, 0.98)), url('../image/background.jpg') no-repeat;
@@ -198,9 +219,14 @@
                             <!-- Password + Hint + Strength -->
                             <div class="form-outline mb-3">
                                 <label for="user_password" class="form-label-luxury">Password</label>
-                                <input type="password" id="user_password" class="form-control form-control-luxury"
-                                    placeholder="e.g. Admin@123" autocomplete="off" required name="user_password"
-                                    oninput="checkPasswordStrength(this.value)">
+                                <div class="password-wrapper">
+                                    <input type="password" id="user_password" class="form-control form-control-luxury"
+                                        placeholder="e.g. Admin@123" autocomplete="off" required name="user_password"
+                                        oninput="checkPasswordStrength(this.value)">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('user_password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
 
                                 <!-- Strength Bar -->
                                 <div class="strength-bar-wrap">
@@ -230,8 +256,13 @@
                             <!-- Confirm Password -->
                             <div class="form-outline mb-3">
                                 <label for="conf_user_password" class="form-label-luxury">Confirm Password</label>
-                                <input type="password" id="conf_user_password" class="form-control form-control-luxury"
-                                    placeholder="Re-enter your password" autocomplete="off" required name="conf_user_password">
+                                <div class="password-wrapper">
+                                    <input type="password" id="conf_user_password" class="form-control form-control-luxury"
+                                        placeholder="Re-enter your password" autocomplete="off" required name="conf_user_password">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('conf_user_password', this)">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Address -->
@@ -392,6 +423,20 @@
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.value = originalBtnValue;
+            }
+        }
+
+        function togglePasswordVisibility(inputId, btnEl) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            const icon = btnEl.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
             }
         }
 

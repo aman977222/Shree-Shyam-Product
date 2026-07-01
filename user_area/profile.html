@@ -138,6 +138,27 @@
           color: #d4af37 !important;
           transform: translateY(-2px);
       }
+      .password-wrapper {
+          position: relative;
+      }
+      .password-wrapper .form-control-luxury {
+          padding-right: 45px !important;
+      }
+      .password-toggle-btn {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: transparent;
+          border: none;
+          color: #d4af37;
+          cursor: pointer;
+          z-index: 10;
+          padding: 0;
+      }
+      .password-toggle-btn:focus {
+          outline: none;
+      }
     </style>
 </head>
 <body>
@@ -225,6 +246,7 @@
 <!-- Import Firebase and database layer -->
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 <script src="../data.js"></script>
 <script>
     let user = null;
@@ -473,25 +495,18 @@
         
         else if (sectionName === 'change_password') {
             container.innerHTML = `
-                <div class="form-glass-card w-50 mx-auto mt-3">
-                    <h3 class="text-center mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">Change Password</h3>
-                    <form id="change-password-form" onsubmit="handlePasswordUpdate(event)">
-                        <div class="form-outline mb-3 text-start">
-                            <label class="form-label-luxury">Current Password</label>
-                            <input type="password" id="current-pass" class="form-control form-control-luxury w-100" required placeholder="Enter current password">
-                        </div>
-                        <div class="form-outline mb-3 text-start">
-                            <label class="form-label-luxury">New Password</label>
-                            <input type="password" id="new-pass" class="form-control form-control-luxury w-100" required placeholder="Enter new password">
-                        </div>
-                        <div class="form-outline mb-4 text-start">
-                            <label class="form-label-luxury">Confirm New Password</label>
-                            <input type="password" id="confirm-new-pass" class="form-control form-control-luxury w-100" required placeholder="Confirm new password">
-                        </div>
-                        <div class="text-center">
-                            <input type="submit" class="btn btn-luxury-primary w-100" value="Update Password">
-                        </div>
-                    </form>
+                <div class="form-glass-card w-50 mx-auto mt-3" id="password-reset-container">
+                    <h3 class="text-center mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">Reset Password</h3>
+                    <p class="text-center text-light mb-4">How would you like to reset your password?</p>
+                    
+                    <div class="d-flex flex-column gap-3 mb-3">
+                        <button class="btn btn-luxury-primary py-3" onclick="sendResetEmailFromProfile()">
+                            <i class="fa-solid fa-envelope me-2"></i> 1. Send Password Reset Email
+                        </button>
+                        <button class="btn btn-secondary py-3" onclick="showOldPasswordForm()" style="background: transparent !important; border: 1px solid rgba(212, 175, 55, 0.3) !important; color: #f1f5f9;">
+                            <i class="fa-solid fa-key me-2"></i> 2. Use Old & New Password
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -557,6 +572,91 @@
         }
     }
 
+    function showOldPasswordForm() {
+        const container = document.getElementById("profile-content-container");
+        container.innerHTML = `
+            <div class="form-glass-card w-50 mx-auto mt-3">
+                <h3 class="text-center mb-4" style="color: #d4af37; font-weight: 700; text-transform: uppercase;">Change Password</h3>
+                <form id="change-password-form" onsubmit="handlePasswordUpdate(event)">
+                    <div class="form-outline mb-3 text-start">
+                        <label class="form-label-luxury">Current Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="current-pass" class="form-control form-control-luxury w-100" required placeholder="Enter current password">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('current-pass', this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-outline mb-3 text-start">
+                        <label class="form-label-luxury">New Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="new-pass" class="form-control form-control-luxury w-100" required placeholder="Enter new password">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('new-pass', this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-outline mb-4 text-start">
+                        <label class="form-label-luxury">Confirm New Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirm-new-pass" class="form-control form-control-luxury w-100" required placeholder="Confirm new password">
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirm-new-pass', this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <button type="button" class="btn btn-secondary w-50" onclick="showSection('change_password')" style="background: transparent !important; border: 1px solid rgba(212, 175, 55, 0.3) !important; color: #f1f5f9;">Back</button>
+                        <input type="submit" class="btn btn-luxury-primary w-50" value="Update Password">
+                    </div>
+                </form>
+            </div>
+        `;
+    }
+
+    async function sendResetEmailFromProfile() {
+        if (!user || !user.user_email) {
+            alert("User email not found.");
+            return;
+        }
+
+        try {
+            await firebase.auth().sendPasswordResetEmail(user.user_email.trim());
+            alert("Password reset link has been sent to your email: " + user.user_email + " 🎉");
+        } catch (err) {
+            console.error(err);
+            if (err.code === 'auth/user-not-found') {
+                try {
+                    // User exists in Firestore but not in Firebase Auth
+                    const tempPassword = Math.random().toString(36).slice(-10) + "A1!";
+                    await firebase.auth().createUserWithEmailAndPassword(user.user_email.trim(), tempPassword);
+                    await firebase.auth().sendPasswordResetEmail(user.user_email.trim());
+                    alert("Password reset link has been sent to your email: " + user.user_email + " 🎉");
+                    return;
+                } catch (createErr) {
+                    console.error(createErr);
+                    alert(createErr.message || "Failed to send reset email.");
+                    return;
+                }
+            }
+            alert(err.message || "Failed to send reset email.");
+        }
+    }
+
+    function togglePasswordVisibility(inputId, btnEl) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        
+        const icon = btnEl.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa-solid fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa-solid fa-eye';
+        }
+    }
+
     async function handlePasswordUpdate(e) {
         e.preventDefault();
         const currentPass = document.getElementById("current-pass").value;
@@ -576,7 +676,7 @@
 
         const hashedCurrent = await hashPassword(currentPass);
         
-        // Check current password
+        // Check current password in Firestore cache/record
         if (user.user_password !== hashedCurrent && user.user_password !== currentPass) {
             alert("Incorrect current password!");
             return;
@@ -593,14 +693,45 @@
             user_password: hashedNew
         };
 
+        const submitBtn = e.target.querySelector('input[type="submit"]');
+        const originalVal = submitBtn ? submitBtn.value : "Update Password";
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.value = "Updating...";
+        }
+
         try {
+            // Update in Firebase Auth
+            let fbUser;
+            try {
+                const authResult = await firebase.auth().signInWithEmailAndPassword(user.user_email, currentPass);
+                fbUser = authResult.user;
+            } catch (authErr) {
+                if (authErr.code === 'auth/user-not-found') {
+                    // Try to create/sync the user in Firebase Auth if not found
+                    const createResult = await firebase.auth().createUserWithEmailAndPassword(user.user_email, currentPass);
+                    fbUser = createResult.user;
+                } else {
+                    throw authErr;
+                }
+            }
+
+            if (fbUser) {
+                await fbUser.updatePassword(newPass);
+            }
+
             await cloudUpdateUser(user.username, updatedData);
             alert("Password updated successfully! Please login again.");
             logoutUser();
             window.location.href = "user_login.html";
         } catch (err) {
             console.error("Error updating password:", err);
-            alert("Failed to update password. Please try again.");
+            alert(err.message || "Failed to update password. Please check your old password.");
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.value = originalVal;
+            }
         }
     }
 
